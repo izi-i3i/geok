@@ -100,7 +100,7 @@ count_digits = function(x)
         {
           out = paste0("~list(~italic(p)", suffix_p, "~'< ",
                  do.call(fn, list(nn, decimal.mark = decimal.mark,
-                        scientific = FALSE, trim = TRUE, ...), "')"))
+                        scientific = FALSE, trim = TRUE, ...)), "')")
         } else {
           out = paste0("<",
                  do.call(fn, list(nn, decimal.mark = decimal.mark,
@@ -204,5 +204,5 @@ format_number = function(x,
   }#end if
 
   return(out)
-}#end function casa_decimal
+}#end_function
 
