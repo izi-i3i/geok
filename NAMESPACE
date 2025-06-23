@@ -16,6 +16,8 @@ importFrom(stats,
     pnorm,
     quantile,
     median,
+    ks.test,
+    shapiro.test,
     IQR)
 importFrom(data.table,
     data.table,

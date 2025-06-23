@@ -19,7 +19,7 @@ format_number(x,
               ...)
 }
 \arguments{
-\item{x}{numeric vector.}
+\item{x}{a vector of real numbers.}
 \item{nsmall}{the minimum number of digits to the right of the decimal point
           in formatting real/complex numbers in non-scientific formats.
           Allowed values are '0 <= nsmall <= 20'.}

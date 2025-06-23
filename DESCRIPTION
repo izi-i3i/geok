@@ -8,7 +8,7 @@ Author: Izi Sousa-Filho
 Maintainer: Sousa-Filho <izi31416@protonmail.com>
 License: GPL (>= 2)
 Description: Analyzis and remove outliers. 
-Depends: R (>= 4.1)
+Depends: R (>= 4.0)
 Encoding: UTF-8
-Packaged: 2025-06-22 12:38:15.777 UTC; salah
-Date: 2025-06-22
+Packaged: 2025-06-23 21:52:11.108 UTC; salah
+Date: 2025-06-23

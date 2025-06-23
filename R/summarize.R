@@ -1,18 +1,19 @@
-##-------------------------------------------
-## Author  : Izi
-## Project :
-## Created : 8 de set de 2018
-## License : MIT
-## Updated : sáb 07 nov 2020 23:56:26 -03
-##-------------------------------------------
+#-------------------------------------------
+# Author  : Izi
+# Project :
+# Created : 8 de set de 2018
+# License : MIT
+# Updated : sáb 07 nov 2020 23:56:26 -03
+#-------------------------------------------
 
 ##========================================
-## ERRO PADRÃO
+## 
 ##========================================
 standard_error = function(x, na.rm = FALSE)
 {
-  if (isTRUE(na.rm)) x = x[!is.na(x)]
-  sd(x) / sqrt(length(x))
+  if(isTRUE(na.rm)) x = x[!is.na(x)]
+  n = length(x)
+  sd(x) / sqrt(n)
 }#end standard_error
 
 ##===========================================
@@ -22,7 +23,7 @@ indots <- function(arg, default, ...)
 {
   dots = list(...)
   out = unlist(dots[arg])
-  if (is.null(out)) out <- default
+  if(is.null(out)) out <- default
   out
 }
 
@@ -37,6 +38,7 @@ match_dots = function(args, fn, arg.rm = "")
   ag = match(fa, names(args))
   args[ag[!is.na(ag)]]
 }
+
 
 ##===========================================
 ##
@@ -64,7 +66,7 @@ Winsorize = function (x,
 ##
 ##===========================================
 winvar <- function(x, trim.ci) {
-  if (any(is.na(x))) return(NA_real_)
+  if(any(is.na(x))) return(NA_real_)
   n <- length(x)
   trn <- floor(trim.ci * n) + 1
   minval <- sort(x, partial = trn)[trn]
@@ -93,8 +95,8 @@ meanCI = function (x,
 {
   if (na.rm) x = x[!is.na(x)]
 
-  if (is.null(n.sample)) n = length(x)
-  if (n <= 1 & is.null(n.sample)) return(NA_real_)
+  if(is.null(n.sample)) n = length(x)
+  if(n <= 1 & is.null(n.sample)) return(NA_real_)
 
 #   sides <- match.arg(sides, choices = c("two.sided", "left", "right"), several.ok = FALSE)
   sides <- match.arg(sides)
@@ -172,7 +174,7 @@ meanCI = function (x,
          right = {res[2] <- -Inf}
   )
 
-  error = if (sides == "right") c(res[3]-res[1]) else c(res[1]-res[2])
+  error = if(sides == "right") c(res[3]-res[1]) else c(res[1]-res[2])
   names(error) <- "error"
 
   cl = format_number(conf.level*100, 0, suffix = "%")
@@ -200,12 +202,11 @@ meanCI = function (x,
 ##===========================================
 freq_tab = function(x, na.rm = FALSE, ...)
 {
-  . = f = p = NULL
-
+  .=f=p=NULL
   h = substitute(x)
   group = as.character(substitute(h))
 
-  if (isTRUE(na.rm))
+  if(isTRUE(na.rm))
     FQ = data.table()[,c(group) := x][!is.na(x)][, .(f = .N), by = group]
   else
     FQ = data.table()[,c(group) := x][, .(f = .N), by = group]
@@ -222,16 +223,16 @@ freq_tab = function(x, na.rm = FALSE, ...)
   return(FQ[])
 }#end freq_tab
 
-
 ##===========================================
 ## KURTOSIS
 ##===========================================
 kurtosis = function(x, kurtosis.type = 2, na.rm = FALSE)
 {
-  if (isTRUE(na.rm)) x = x[!is.na(x)]
+  #if(na.rm) x = na.omit(x)
+  if(isTRUE(na.rm)) x = x[!is.na(x)]
   n <- length(x)
-  if (kurtosis.type == 1) out = n * sum((x - mean(x))^4) / (sum((x - mean(x))^2)^2)
-  if (kurtosis.type == 2) out = (1/n) * (sum( ((x - mean(x)) / sd(x))^4)) - 3
+  if(kurtosis.type == 1) out = n * sum((x - mean(x))^4) / (sum((x - mean(x))^2)^2)
+  if(kurtosis.type == 2) out = (1/n) * (sum( ((x - mean(x)) / sd(x))^4)) - 3
 
   return(out)
 }#end kurtosis
@@ -241,30 +242,100 @@ kurtosis = function(x, kurtosis.type = 2, na.rm = FALSE)
 ##===========================================
 skewness = function(x, skewness.type = 2, na.rm = FALSE)
 {
-  #if (na.rm) x = na.omit(x)
-  if (isTRUE(na.rm)) x = x[!is.na(x)]
+  if(isTRUE(na.rm)) x = x[!is.na(x)]
   n = length(x)
-  if (skewness.type == 1)
+  if(skewness.type == 1)
     out = (sum((x - mean(x))^3) / n) / (sum((x - mean(x))^2) / n)^(3/2)
-  if (skewness.type == 2)
+  if(skewness.type == 2)
     out = (1/n) * sum( ((x - mean(x)) / sd(x))^3 )
 
   return(out)
 }#end skewness
 
+skewness2 <- function (x,
+                       na.rm = FALSE,
+                       skewness.method = c("fisher","moment")
+){
+  if(isTRUE(na.rm)) x = x[!is.na(x)]
+  n = length(x)
+  skewness.method = match.arg(skewness.method)
+  skew <- switch(skewness.method,
+                 moment = {
+                   x <- x - mean(x)
+                   (sum(x^3)/n)/(sum(x^2)/n)^1.5
+                 },
+                 fisher = {
+                   x <- x - mean(x)
+                   ((sqrt(n * (n - 1))/(n - 2)) * (sum(x^3)/n))/((sum(x^2)/n)^1.5)
+                 })
+    skew
+}
+
+##===========================================
+##
+##===========================================
+trimmed_mean = function (x, trim = .1, na.rm = FALSE)
+{
+  trim_mean = function (x, trim = .1, na.rm = TRUE)
+  {
+    if (!is.numeric(x) && !is.complex(x) && !is.logical(x)) {
+      warning("argument is not numeric or logical: returning NA")
+      return(NA_real_)
+    }
+    if (isTRUE(na.rm))
+      x <- x[!is.na(x)]
+    if (!is.numeric(trim) || length(trim) != 1L)
+      stop("'trim' must be numeric of length one")
+    n <- length(x)
+    if (trim > 0 && n) {
+      if (is.complex(x))
+        stop("trimmed means are not defined for complex data")
+      if (anyNA(x))
+        return(NA_real_)
+      if (trim >= 0.5)
+        return(stats::median(x, na.rm = FALSE))
+      lo <- floor(n * trim) + 1
+      hi <- n + 1 - lo
+      x <- sort.int(x, partial = unique(c(lo, hi)))[lo:hi]
+    }
+    mean(x)
+  }
+  sapply(trim, FUN = trim_mean, x = x, USE.NAMES = FALSE)
+}
+
+##===========================================
+##
+##===========================================
+mad2 = function (x,
+                 center = median(x),
+                 constant = 1.4826,
+                 na.rm = TRUE,
+                 low = FALSE,
+                 high = FALSE)
+{
+  if (isTRUE(na.rm)) x <- x[!is.na(x)]
+  n <- length(x)
+  constant * if ((low || high) && n%%2 == 0) {
+    if (low && high)
+      stop("'low' and 'high' cannot be both TRUE")
+    n2 <- n%/%2 + as.integer(high)
+    sort(abs(x - center), partial = n2)[n2]
+  } else median(abs(x - center))
+}
+
 ##========================================
-## AMPLITUDE
+##
 ##========================================
 amplitude = function(x, na.rm=FALSE) return(max(x, na.rm = na.rm) - min(x, na.rm = na.rm))
 
 ##========================================
-## COEFICIENTE DE VARIAÇÃO
+##
 ##========================================
 coef_var = function(x, na.rm = FALSE)
   return(sd(x, na.rm = na.rm) / mean(x, na.rm = na.rm))
 
 ##========================================
-## VALORES FALTANTES
+##
 ##========================================
 missing_count = function(x, missing.val = NA, action = c("<=", "=", ">="))
 {
@@ -275,7 +346,7 @@ missing_count = function(x, missing.val = NA, action = c("<=", "=", ">="))
        missing.val = sum(x %in% missing.val)
      },
      "<=" = {
-       if (length(missing.val) == 1 & any(is.na(missing.val))) {
+       if(length(missing.val) == 1 & any(is.na(missing.val))) {
          missing.val = sum(is.na(x))
        } else {
          missing.val =
@@ -283,7 +354,7 @@ missing_count = function(x, missing.val = NA, action = c("<=", "=", ">="))
        }
      },
      ">=" = {
-        if (length(missing.val) == 1 & any(is.na(missing.val))) {
+        if(length(missing.val) == 1 & any(is.na(missing.val))) {
           missing.val = sum(is.na(x))
         } else {
           missing.val =
@@ -294,13 +365,12 @@ missing_count = function(x, missing.val = NA, action = c("<=", "=", ">="))
   return(missing.val)
 }#end missing_count
 
-
 ##===========================================
 ##
 ##===========================================
 missing_rm = function(x, missing.val = NULL, action = c("<=", "=", ">="))
 {
-  if (is.null(missing.val)) return(FALSE)
+  if(is.null(missing.val)) return(FALSE)
 
   action <- match.arg(action)
 
@@ -309,14 +379,14 @@ missing_rm = function(x, missing.val = NULL, action = c("<=", "=", ">="))
             x %in% missing.val
      },
      "<=" = {
-       if (length(missing.val) == 1 & any(is.na(missing.val))) {
+       if(length(missing.val) == 1 & any(is.na(missing.val))) {
          missing.val = is.na(x)
        } else {
          x <= max(missing.val, na.rm = TRUE)
        }
      },
      ">=" = {
-       if (length(missing.val) == 1 & any(is.na(missing.val))) {
+       if(length(missing.val) == 1 & any(is.na(missing.val))) {
          missing.val = is.na(x)
        } else {
          x >= max(missing.val, na.rm = TRUE)
@@ -326,29 +396,27 @@ missing_rm = function(x, missing.val = NULL, action = c("<=", "=", ">="))
   return(out)
 }#end missing_count
 
-
 ##===========================================
 ##
 ##===========================================
 interval_range = function(x,
                           digits = 2,
                           decimal.mark = ",",
-                          na.rm = FALSE,
-                          prettyNum=FALSE
+                          na.rm = FALSE
 ){
-  if (isTRUE(na.rm)) x = x[!is.na(x)]
-  if (any(is.na(x))) return(NA)
+  if(isTRUE(na.rm)) x = x[!is.na(x)]
+  if(any(is.na(x))) return(NA)
 
-  if (is.numeric(x))
+  if(is.numeric(x))
   {
     xmin = format_number(min(x),
-              nsmall = digits, decimal.mark = decimal.mark, prettyNum=prettyNum)
+              nsmall = digits, decimal.mark = decimal.mark)
     xmax = format_number(max(x),
-              nsmall = digits, decimal.mark = decimal.mark, prettyNum=prettyNum)
-    res = if (is.na(xmin) & is.na(xmax))
+              nsmall = digits, decimal.mark = decimal.mark)
+    res = if(is.na(xmin) & is.na(xmax))
     {
       NA_character_
-    } else if (xmin == xmax){
+    } else if(xmin == xmax){
       xmin
     } else {
       paste0(xmin,"/",xmax)
@@ -356,15 +424,13 @@ interval_range = function(x,
 
   } else {
     fac = is.factor(x)
-    if (fac) warning("In interval_range, vector is factor: using levels", call. = FALSE)
-    xmin = if (fac) min(levels(x)) else min(x)
-    xmax = if (fac) max(levels(x)) else max(x)
-    res = if (xmin == xmax) xmin else paste0(xmin,"/",xmax)
+    if(fac) warning("In interval_range, vector is factor: using levels", call. = FALSE)
+    xmin = if(fac) min(levels(x)) else min(x)
+    xmax = if(fac) max(levels(x)) else max(x)
+    res = if(xmin == xmax) xmin else paste0(xmin,"/",xmax)
   }
   return(res)
 }#end interval_range
-
-
 
 ##===========================================
 ##
@@ -373,7 +439,7 @@ coef_params = function(x, default = NULL)
 {
   sx = as.character(substitute(x))
 
-  if (is.null(default))
+  if(is.null(default))
   {
     default = c(Total.N = "Total.N", Missing = "Missing", Valid.N="Valid.N",
                 Min = "Min", Q1 = "Q1", Median = "Median",
@@ -382,13 +448,13 @@ coef_params = function(x, default = NULL)
                 Skewness = "Skewness", Kurtosis = "Kurtosis")
   }
 
-  if (is.null(names(default))) names(default) <- default
-  if (is.null(names(x))) warning("vector elements must be named")
-  if (is.null(x) | is.null(names(x))) return(list('changed'=default, 'vector'=default))
+  if(is.null(names(default))) names(default) <- default
+  if(is.null(names(x))) warning("vector elements must be named")
+  if(is.null(x) | is.null(names(x))) return(list('changed'=default, 'vector'=default))
 
-  if (class(x) != class(default))
+  if(class(x) != class(default))
   {
-    if (is.numeric(default))
+    if(is.numeric(default))
     {
       xnames = names(x)
       x = suppressWarnings(as.numeric(x))
@@ -405,12 +471,12 @@ coef_params = function(x, default = NULL)
 
   valid_names = x_names[!(x_names %in% x_names[par_diff])]
 
-  if (any(duplicated(names(valid_names)))) warning("duplicated names")
+  if(any(duplicated(names(valid_names)))) warning("duplicated names")
   valid_names = valid_names[!duplicated(names(valid_names))]
 
   ign = paste(paste0(non, collapse = ", "),
               paste0(par_diff, collapse = ", "), collapse=", ")
-  if (length(par_diff)) warning(sprintf("In %s, ignored: %s",sx, ign), call. = F)
+  if(length(par_diff)) warning(sprintf("In %s, ignored: %s",sx, ign), call. = F)
 
   parNames = c(valid_names, default)
   parNames = parNames[!duplicated(names(parNames))]
@@ -419,19 +485,21 @@ coef_params = function(x, default = NULL)
   return(list('changed'=valid_names, 'vector'=vec))
 }
 
-
-
 ##===========================================
 ##
 ##===========================================
 quantile2 = function(x, probs = c(0.5), quantile.type = 7, na.rm = FALSE)
   quantile(x, probs = probs, type = quantile.type, na.rm = na.rm, names = FALSE)
 
-#===========================================
-# 
-#===========================================
+# stats:::quantile.default
+
 iqr = function(x, na.rm = FALSE, quantile.type = 7)
   IQR(x, na.rm = na.rm, type = quantile.type)
+
+##===========================================
+##
+##===========================================
+n_unique = function(x)length(unique(x))
 
 ##===========================================
 ##
@@ -440,11 +508,11 @@ symbs = function(symb.mean = NULL,
                  symb.median = NULL,
                  symb.five = NULL,
                  symb.custom = NULL,
-                 minusplus.sign = TRUE,
-                 ...)
-{
+                 minusplus.sign = FALSE,
+                 ...
+){
   smean =
-    if (minusplus.sign)
+    if(minusplus.sign)
       c(a = "", b = " \u00b1 ", c = " (", d = " - ", e = ") ", f = "")
     else
       c(a = "", b = " (", c = ") [", d = "; ", e = "] ", f = "")
@@ -454,7 +522,7 @@ symbs = function(symb.mean = NULL,
   smedian = c(a="", b=" (", c=") [", d="; ", e="] ", f="")
   smedian[names(symb.median)] = symb.median
 
-  sfive = c(a="", b=" | ", c=" | ", d=" | ", e=" | ", f="")
+  sfive = c(a="", b=" | ", c=" | ", d=" | ", e=" | ", f=" | ")
   sfive[names(symb.five)] = symb.five
 
   scustom = c(a="", b=" | ", c=" | ", d=" | ", e=" | ", f="")
@@ -502,6 +570,58 @@ ad_test = function (x)
 }
 
 ##===========================================
+##
+##===========================================
+normality_test = function(x,
+            method.normality = c("kolmogorov.smirnov", "shapiro.wilk", "anderson.darling"),
+            na.rm = FALSE,
+            ...
+){
+  if(na.rm) x = x[!is.na(x)]
+
+  method.normality = match.arg(method.normality)
+
+  out = switch(method.normality,
+         shapiro.wilk = {
+                 tryCatch({
+                   shapiro.test(x)$p.value
+                 }, error = function(e) {
+                   warning('shapiro.wilk test: sample size must be between 3 and 5000',
+                           call.=FALSE)
+                   return(NA_real_)  } )
+               },
+         kolmogorov.smirnov = {
+                 withCallingHandlers({
+                   ks.test(x,
+                           y = 'pnorm',
+                           mean(x), sd(x),
+                           alternative = "two.sided",
+                           exact = NULL,
+                           simulate.p.value = FALSE,
+                           B = 2000)$p.value
+
+                 }, warning = function(cond) {
+                   txt <- conditionMessage(cond)
+                   ## do with txt what you will, e.g.,
+                   ## logwarn(txt, logger="some_log_file.log")
+                   warning(txt, call. = F)
+                   ## signal that the warning has been handled
+                   invokeRestart("muffleWarning")
+                 })
+               },
+         anderson.darling = {
+                 tryCatch({
+                   ad_test(x)$p.value
+                 }, error = function(e) {
+                   warning('ad_test: sample size must be greater than 7',
+                           call.=FALSE)
+                   return(NA_real_)  } )
+               }
+  )#end-switch
+  return(out)
+}
+
+##===========================================
 ## SUMARIO
 ##===========================================
 summarize = function(x,
@@ -522,9 +642,8 @@ summarize = function(x,
                      custom5numbers = NULL,
                      sample.name = NULL,
                      sample.col = FALSE,
-                     symb.header = symbs(minusplus.sign = TRUE),
-                     symb.body = symbs(minusplus.sign = TRUE),
-                     prettyNum = FALSE,
+                     symb.header = symbs(),
+                     symb.body = symbs(),
                      ...
 ){
   .=Missing=Total.N=Valid.N=id=m_rm=NULL
@@ -535,13 +654,13 @@ summarize = function(x,
 
   language = match.arg(language)
 
-  if (language == "pt") if (decimal.mark == "auto") decimal.mark = ","
-  if (language == "en") if (decimal.mark == "auto") decimal.mark = "."
+  if(language == "pt") if(decimal.mark == "auto") decimal.mark = ","
+  if(language == "en") if(decimal.mark == "auto") decimal.mark = "."
 
   ##===============-----------===============##
-  if (is.vector(x) | is.name(x))
+  if(is.vector(x) | is.name(x))
   {
-    if (is.name(x))
+    if(is.name(x))
     {
       mvar = as.character(x)
     } else {
@@ -551,32 +670,31 @@ summarize = function(x,
     measure.var = str2lang(mvar)
     DT = data.table()[,(mvar) := eval(x)]
 
-    if (!is.null(interval))
+    if(!is.null(interval))
     {
       warning(sprintf("In interval, ignored: %s", interval), call. = FALSE)
       interval = NULL
     }#endif
   } else {
-    if (!is.character(measure.var))
+    if(!is.character(measure.var))
       stop("In measure.var: only characters", call. = FALSE)
 
     mvar = measure.var
     measure.var = str2lang(measure.var)
-    if (!is.null(interval)) group_parse = parse(text=interval)
+    if(!is.null(interval)) group_parse = parse(text=interval)
     setDT(x)
     DT = copy(x)
   }#endif
 
-  if (missing.rm)
+  if(missing.rm)
   {
     DT[, m_rm := do.call("missing_rm"
                          , c(list(x=eval(measure.var), missing.val=missing.val)
-                             , match_dots(dots, missing_rm)))]
+                         , match_dots(dots, missing_rm)))]
     DT = DT[m_rm == isTRUE(m_rm)]
     DT[, m_rm := NULL]
   }
 
-  ##===============-----------===============##
   DT = DT[,.SD, .SDcols = unique(c(group.by, mvar, interval))]
 
   dt_names = names(copy(DT))
@@ -599,8 +717,7 @@ summarize = function(x,
   # Range    - Range
   # Skewness - Measure of asymmetry
   # Kurtosis - Measure of the tailedness
-  # lowerCI  - Confidence interval
-  # upperCI  - Confidence interval
+  # Normality - Normality test
 
   edn = c("Total.N",
           "Missing",
@@ -619,7 +736,8 @@ summarize = function(x,
           "IQR",
           "Range",
           "Skewness",
-          "Kurtosis"
+          "Kurtosis",
+          "Normality"
   )
 
   names(edn) = edn
@@ -677,20 +795,23 @@ summarize = function(x,
         do.call("skewness"
                 , c(list(x=eval(measure.var)), match_dots(dots, skewness))),
         do.call("kurtosis"
-                , c(list(x=eval(measure.var)), match_dots(dots, kurtosis)))
+                , c(list(x=eval(measure.var)), match_dots(dots, kurtosis))),
+
+        do.call("normality_test"
+                , c(list(x=eval(measure.var))
+                    , match_dots(dots, normality_test, arg.rm="")))
 
         ), by = group.by]
 
   DT[, Valid.N := Total.N - Missing]
 
-
-  ##===============-----------===============##
+  # =========================================================================
   qdots = match_dots(dots, quantile2)
   qprob  = qdots[names(qdots)=="probs"]
 
-  ##===============-----------===============##
   # PROBS - quantile
-  if (!is.null(dots$probs))
+  # =========================================================================
+  if(!is.null(dots$probs))
   {
     for(i in 1:n_probs)
       DT[,(paste0("Q",dots$probs[i]*100)) := .(
@@ -703,8 +824,9 @@ summarize = function(x,
   }
 
   # TRIM - mean.default
+  # =========================================================================
   trm = match_dots(dots, mean.default)
-  if ("trim"%in%names(trm))
+  if("trim"%in%names(trm))
   {
     for(i in 1:n_trim)
       DT[,(paste0("TM",dots$trim[i]*100)) := .(
@@ -715,8 +837,7 @@ summarize = function(x,
   }
 
   r = c("trim.ci", "trim", "probs")
-
-  if (!is.null(fun))
+  if(!is.null(fun))
   {
     for(i in 1:length(fun))
     {
@@ -729,30 +850,30 @@ summarize = function(x,
     }
   }
 
-  ##===============-----------===============##
+  # =========================================================================
   dt_new_names = names(copy(DT))
   names(dt_new_names) = dt_new_names
   parametros = c(dt_new_names[!(dt_new_names %in% dt_names)])
 
-  param_ft = paste0(parametros,".",1) # para distinguir as colunas formatadas
+  param_ft = paste0(parametros,".",1)
   dig_param = rep(digits, length(param_ft))
   names(dig_param) = parametros
-  dig_param[c(1:3)] <- 0 #digitos padrão
+  dig_param[c(1:3)] <- 0
 
   digVec = c("Interval" = 0, dig_param)
 
   dig_diff = names(params.digits)[!(names(params.digits) %in% names(digVec))]
 
-  if (length(dig_diff))
+  if(length(dig_diff))
     warning(sprintf("In params.digits: ignored '%s'",
           paste(dig_diff, collapse = ", ")), call. = FALSE)
 
   digPar = c(params.digits, digVec)
   digPar = digPar[!duplicated(names(digPar))]
 
-  ##===============-----------===============##
+  # =========================================================================
   interval_col = NULL
-  if (!is.null(interval))
+  if(!is.null(interval))
   {
     interval_col = paste0(interval,1:length(interval))
     for(i in 1:length(interval_col))
@@ -764,41 +885,41 @@ summarize = function(x,
     }
   }
 
-  # =============== NUM  ===============
-  if (!is.null(interval))
+  # NUM
+  # =========================================================================
+  if(!is.null(interval))
   {
     NUM = unique(DT[,.SD, .SDcols = c(group.by, interval_col, parametros)])
     setnames(NUM, interval_col, interval)
   } else {
     NUM = unique(DT[,.SD, .SDcols = c(group.by, parametros)])
   }
-
   # id auxiliar
   NUM[,id := 1:.N]
   # cabeça NUM
   HEAD = NUM[,.SD, .SDcols = !parametros]
 
-  ##===============-----------===============##
+  # =========================================================================
   for(i in 1:length(param_ft))
   {
     NUM[, c(param_ft[i]) := format_number(eval(str2lang(parametros[i])),
-                digPar[parametros[i]], prettyNum=prettyNum, decimal.mark = decimal.mark)
+                digPar[parametros[i]], decimal.mark = decimal.mark)
     ,by=group.by]
   }
 
-  ##===============-----------===============##
+  # =========================================================================
   NF = NUM[,.SD, .SDcols = param_ft]
   NUM = NUM[,.SD, .SDcols = !c(param_ft),by=group.by]
   setnames(NF, parametros)
   NF[,id := 1:.N]
 
-  ##===============-----------===============##
+  # =========================================================================
   SMT = HEAD[NF,on = "id"]
   SMT = SMT[, lapply(.SD, as.character)]
   NUM[,id := NULL]
 
-  ##===============-----------===============##
-  if (is.null(group.by))
+  # =========================================================================
+  if(is.null(group.by))
   {
     FT = melt(SMT,
               id.vars = c("id"),
@@ -819,61 +940,39 @@ summarize = function(x,
     FT = dcast(FTmelt, args_dcast, value.variable = "value")
   }#endif
 
-  ##===============-----------===============##
+  # =========================================================================
   names(parametros) = parametros
-  if (is.null(params)) params = parametros
+  if(is.null(params)) params = parametros
   names(params) = params
   old_params = params
   params = coef_params(params, parametros)[[1]]
 
-  if (language == "pt")
+  if(language == "pt")
   {
-    if(F)
-    {
-      params_names = c(Total.N="N-Total",
-                       Missing="Valor Faltante",
-                       Valid.N="N-Amostral",
-                       Min="M\u00ednimo",
-                       Max="M\u00e1ximo",
-                       Median="Mediana",
-                       SAM="M\u00e9dia",
-                       TM10="MT10%",
-                       MAD="DAM",
-                       SD="Desvio Padr\u00e3o",
-                       SE="Erro Padr\u00e3o",
-                       CV="CV",
-                       Q25="Q25%",
-                       Q75="Q75%",
-                       IQR="IIQ",
-                       Range="Amplitude",
-                       Skewness="Assimetria",
-                       Kurtosis="Curtose"
-      )
-    } else {
-      params_names = c(Total.N="N.total",
-                       Missing="Valor.faltante",
-                       Valid.N="N.amostral",
-                       Min="Minimo",
-                       Max="Maximo",
-                       Median="Mediana",
-                       SAM="Media",
-                       TM10="MT10",
-                       MAD="DAM",
-                       SD="Desvio.pad",
-                       SE="Erro.pad",
-                       CV="CV",
-                       Q25="Q25",
-                       Q75="Q75",
-                       IQR="IIQ",
-                       Range="Amplitude",
-                       Skewness="Assimetria",
-                       Kurtosis="Curtose"
-      )
-    }
+    params_names = c(Total.N="N.Total",
+                     Missing="Valor.Faltante",
+                     Valid.N="N.V\u00E1lido",
+                     Min="M\u00Ednimo",
+                     Max="M\u00E1ximo",
+                     Median="Mediana",
+                     SAM="M\u00E9dia",
+                     TM10="MT10",
+                     MAD="DAM",
+                     SD="Desvio.Padr\u00E3o",
+                     SE="Erro.Padr\u00E3o",
+                     CV="CV",
+                     Q25="Q25",
+                     Q75="Q75",
+                     IQR="IIQ",
+                     Range="Amplitude",
+                     Skewness="Assimetria",
+                     Kurtosis="Curtose",
+                     Normality='Normalidade'
+    )
 
-    if (!is.null(params.names))
+    if(!is.null(params.names))
     {
-      new_params = params[!(names(params) %in% names(params_names))]
+      new_params = params[!(names(params)%in%names(params_names))]
       params_names =  c(params_names, new_params)
       params.names = coef_params(params.names, params_names)[[2]]
     } else {
@@ -881,26 +980,22 @@ summarize = function(x,
     }
   }
 
-  params_ft = if (!is.null(interval)) c(interval, params) else params
+  params_ft = if(!is.null(interval)) c(interval, params) else params
   setkeyv(FT, variable.name)
   FT = FT[params_ft]
 
-  ##===============-----------===============##
   names_num = copy(names(NUM))
   names(names_num) = names_num
-#   return(names_num)
-  params_num = names_num[!(names_num %in% parametros)]
+  params_num = names_num[!(names_num%in%parametros)]
   NUM = NUM[,.SD, .SDcols = c(params_num, params)]
 
-  ##===============-----------===============##
-  if (!is.null(params.names))
+  if(!is.null(params.names))
   {
     names_num = names_num[!names_num%in%params.names]
     dp = duplicated(c(names_num, params.names))
-#     return(list(names_num, params.names))
     pp = any(params%in%names(params.names))
 
-    if (any(dp) & pp)
+    if(any(dp) & pp)
     {
       dup = c(names_num, params.names)[dp]
       warning(sprintf("In 'params.names', duplicate names not changed: %s",
@@ -912,7 +1007,7 @@ summarize = function(x,
 
     params.names = coef_params(params.names, params)[[2]]
 
-    if (length(params.names))
+    if(length(params.names))
     {
       setnames(NUM, names(params.names), params.names)
 
@@ -925,10 +1020,10 @@ summarize = function(x,
     }
   }
 
-  # GLUE ====================================================================
-  if (is.null(params.names)) params.names = params
+  if(is.null(params.names)) params.names = params
 
-  ##===============-----FIVE_NUMBERS------===============##
+  # FIVE_NUMBERS
+  # =========================================================================
   five_numbers = function(fn, mean.sd = TRUE, symb.header, symb.body, sample.col)
   {
     par.names = paste0("`", fn, "`")
@@ -942,40 +1037,43 @@ summarize = function(x,
     P5 = NUM[, fn[5],with=F]
 
     is_int_p5 = P5[,is.integer(eval(p5))]
-    dig5 = if (is_int_p5) 0 else digits
+    dig5 = if(is_int_p5) 0 else digits
     P5[,(fn[5]) := format_number(eval(p5),
-                      nsmall=dig5, decimal.mark=decimal.mark, prettyNum=prettyNum)]
+                      nsmall=dig5, decimal.mark=decimal.mark)]
 
-    if (is.null(group.by)) group.by = 1
+    if(is.null(group.by)) group.by = 1
     A = NUM[,.SD, .SDcols = group.by]#!is.numeric]
 
-      def = names(fn)
-      if(is.null(def) & language == "en") def = fn
-      if(is.null(def) & language == "pt") def = names(params_names[params_names |> match(x = fn)])
+    def = names(fn)
+    if(is.null(def) & language == "en") def = fn
+    if(is.null(def) & language == "pt")
+    {
+      pn = params_names[params_names %in% fn]
+      def = names(pn)
+    }
 
     B = NUM[, list(
       ed = paste0(
             symb.body[1],
             format_number(eval(p1),
-               nsmall=digPar[def[1]], decimal.mark = decimal.mark, prettyNum=prettyNum),
+               nsmall=digPar[def[1]], decimal.mark = decimal.mark),
             symb.body[2],
             format_number(eval(p2),
-               nsmall=digPar[def[2]], decimal.mark=decimal.mark, prettyNum=prettyNum),
+               nsmall=digPar[def[2]], decimal.mark=decimal.mark),
             symb.body[3],
             format_number(eval(p3),
-               nsmall=digPar[def[3]], decimal.mark=decimal.mark, prettyNum=prettyNum),
+               nsmall=digPar[def[3]], decimal.mark=decimal.mark),
             symb.body[4],
             format_number(eval(p4),
-               nsmall=digPar[def[4]], decimal.mark=decimal.mark, prettyNum=prettyNum),
+               nsmall=digPar[def[4]], decimal.mark=decimal.mark),
             symb.body[5],
             if(!sample.col) P5[,eval(p5)],
             symb.body[6]
           ))]
 
+     SMY = if(sample.col) cbind(A,P5,B) else cbind(A,B)
 
-     SMY = if (sample.col) cbind(A,P5,B) else cbind(A,B)
-
-     if (is.null(sample.name))
+     if(is.null(sample.name))
      {
        sample.name = paste0(
                          symb.header[1],
@@ -983,13 +1081,12 @@ summarize = function(x,
                          fn[2], symb.header[3],
                          fn[3], symb.header[4],
                          fn[4], symb.header[5],
-                         if (!sample.col) fn[5], symb.header[6])
+                         if(!sample.col) fn[5], symb.header[6])
      }
      setnames(SMY, "ed", sample.name)
      return(SMY)
   }#end five_numbers
 
-  ##===============-----------===============##
   mean_def = edn[c("SAM", "SD", "Min", "Max", "Valid.N")]
   median_def = edn[c("Median", "MAD", "Min", "Max", "Valid.N")]
   five_def = edn[c("Min", "Q25", "Median", "Q75", "Max")]
@@ -999,7 +1096,7 @@ summarize = function(x,
   fiven = params.names[five_def]
 
   MEAN5 =
-    if ( all(mean5 %in% params.names))
+    if( all(mean5 %in% params.names))
       five_numbers(fn = mean5,
                    mean.sd = TRUE,
                    symb.header = symb.header[["symb.mean"]],
@@ -1008,7 +1105,7 @@ summarize = function(x,
     else NULL
 
   MEDIAN5 =
-    if ( all(median5 %in% params.names))
+    if( all(median5 %in% params.names))
       five_numbers(fn = median5,
                    mean.sd = FALSE,
                    symb.header = symb.header[["symb.median"]],
@@ -1017,7 +1114,7 @@ summarize = function(x,
     else NULL
 
   FIVEN =
-    if ( all(fiven %in% params.names))
+    if( all(fiven %in% params.names))
       five_numbers(fn = fiven,
                    mean.sd = FALSE,
                    symb.header = symb.header[["symb.five"]],
@@ -1027,14 +1124,15 @@ summarize = function(x,
 
   CUSTOM5 = NULL
 
-  if (!is.null(custom5numbers))
+  if(!is.null(custom5numbers))
   {
-    if (all(custom5numbers %in% params.names))
+    if(all(custom5numbers %in% params.names))
     {
-      CUSTOM5 = five_numbers(custom5numbers, FALSE,
-                   symb.header = symb.header[["symb.custom"]],
-                   symb.body = symb.body[["symb.custom"]],
-                             sample.col=FALSE)
+      CUSTOM5 = five_numbers(custom5numbers,
+                             mean.sd = FALSE,
+                             symb.header = symb.header[["symb.custom"]],
+                             symb.body = symb.body[["symb.custom"]],
+                             sample.col=sample.col)
     } else {
       cust_dif = custom5numbers[!custom5numbers %in% params.names]
       warning(
@@ -1044,20 +1142,19 @@ summarize = function(x,
     }
   }
 
-
-  if (five.numbers)
+  if(five.numbers)
   {
     out = list('numeric' = NUM,
                'formated' = FT,
                'mean5numbers' = MEAN5,
                'median5numbers' = MEDIAN5,
-               'fiveNumbers' = FIVEN)
+               'fiveNumbers' = FIVEN
+    )
 
-    if (!is.null(custom5numbers)) out = c(out, 'custom5numbers' = list(CUSTOM5))
+    if(!is.null(custom5numbers)) out = c(out, 'custom5numbers' = list(CUSTOM5))
   } else {
     out = list('numeric' = NUM, 'formated' = FT)
   }
 
   return(out)
-}#end summary_dt
-
+}#end summarize

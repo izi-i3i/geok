@@ -1,4 +1,3 @@
-
 %
 \name{summarize}
 \alias{summarize}
@@ -25,12 +24,11 @@ summarize(x,
           custom5numbers = NULL,
           sample.name = NULL,
           sample.col = FALSE,
-          symb.header = symbs(minusplus.sign = TRUE),
-          symb.body = symbs(minusplus.sign = TRUE),
-          prettyNum = FALSE,
+          symb.header = symbs(),
+          symb.body = symbs(),
           ...)
 }
-%- maybe also 'usage' for other objects documented here.
+% maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{ A data.frame or vector. }
   \item{measure.var}{measure.var}
@@ -52,7 +50,6 @@ summarize(x,
   \item{sample.col}{sample.col}
   \item{symb.header}{symb.header}
   \item{symb.body}{symb.body}
-  \item{prettyNum}{prettyNum}
   \item{...}{args to}
 }
 \value{

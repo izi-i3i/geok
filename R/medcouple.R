@@ -9,8 +9,8 @@ medcouple <- function(x, do.reflect = "auto", na.rm = FALSE){
 
   if(na.rm) x = x[!is.na(x)]
 
-  if (anyNA(x[is.na(x)])) stop("Data with NA! Consider removing using na.rm = TRUE")
-  if (!is.numeric(x)) stop("Data must be a vector or numeric matrix!")
+  if (anyNA(x)) stop("Data with NA!\n Consider removing using 'na.rm = TRUE'")
+  if (is.character(x)) stop("Non-numeric argument!\n Data must be a vector or numeric matrix")
 
   x = data.matrix(x)
   nr = nrow(x)
