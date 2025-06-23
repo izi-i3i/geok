@@ -77,127 +77,6 @@ winvar <- function(x, trim.ci) {
 }
 
 ##===========================================
-##
-##===========================================
-meanCI = function (x,
-                   sd = NULL,
-                   n.sample = NULL,
-                   trim.ci = 0,
-                   method = c("classic", "boot"),
-                   conf.level = 0.95,
-                   sides = c("two.sided", "left", "right"),
-                   na.rm = FALSE,
-                   band = c("formated", "all", "low", "up", "error"),
-                   digits = 3,
-                   decimal.mark = ",",
-                   formated.collapse = TRUE,
-                   ...)
-{
-  if (na.rm) x = x[!is.na(x)]
-
-  if(is.null(n.sample)) n = length(x)
-  if(n <= 1 & is.null(n.sample)) return(NA_real_)
-
-#   sides <- match.arg(sides, choices = c("two.sided", "left", "right"), several.ok = FALSE)
-  sides <- match.arg(sides)
-  if (sides != "two.sided") conf.level = 1 - 2 * (1 - conf.level)
-
-  method = match.arg(method)
-
-  res = switch(method,
-   classic =
-   { # CLASSIC
-     if (trim.ci != 0)
-     {
-       wvar <- winvar(x, trim.ci)
-       se <- sqrt(wvar["var"]) / ((1 - 2 * trim.ci) * sqrt(n))
-       mean_trim = mean(x, trim.ci = trim.ci) + c(0, -1, 1)
-       res <-  mean_trim * qt(1 - (1 - conf.level)/2, wvar["DF"]) * se
-       names(res) <- c("mean", "lowerCI", "upperCI")
-       res
-
-     } else {
-
-       error = if (is.null(sd))
-       {
-         qt(p = (1 - conf.level)/2, df = n - 1) * sd(x)/sqrt(n)
-       } else if (is.null(n.sample)) {
-         qnorm(p = (1 - conf.level)/2) * sd/sqrt(n)
-       } else if (!is.null(sd) & !is.null(n.sample))
-         qt(p = (1 - conf.level)/2, df = n - 1) * sd/sqrt(n)
-
-       xbar = mean(x)
-       res = c(mean = xbar, lowerCI = xbar + error, upperCI = xbar - error)
-
-     }#end-if-trim.ci
-   },
-   boot = {
-     # BOOT
-     btype <- indots(..., arg = "type", default = "basic")
-
-     if (trim.ci != 0)
-     {
-       boot.fun <- boot::boot(x,
-                        statistic = function(x, i) {
-                          m <- mean(x[i], na.rm = FALSE, trim.ci = trim.ci)
-                          n <- length(i)
-                          v <- winvar(x, trim.ci)/((1 - 2 * trim.ci) * sqrt(n))^2
-                          c(m, v)
-                        },
-                        R = indots(..., arg = "R", default = 999),
-                        parallel = indots(..., arg = "parallel", default = "no"))
-     } else {
-       boot.fun <- boot::boot(x,
-                        statistic = function(x, i) {
-                          m <- mean(x[i], na.rm = FALSE)
-                          n <- length(i)
-                          v <- (n - 1) * var(x[i])/n^2
-                          c(m, v)
-                        },
-                        R = indots(..., arg = "R", default = 999),
-                        parallel = indots(..., arg = "parallel", default = "no"))
-     }#end-if-trim.ci
-
-     ci <- boot::boot.ci(boot.fun, conf = conf.level, type = btype)
-
-     if (btype == "norm")
-     {
-       res <- c(mean = boot.fun$t0[1], lowerCI = ci[[4]][2], upperCI = ci[[4]][3])
-     } else {
-       res <- c(mean = boot.fun$t0[1], lowerCI = ci[[4]][4], upperCI = ci[[4]][5])
-     }#end-if-norm
-   }
-  )#end-switch
-
-  switch(sides,
-         left = {res[3] <- Inf},
-         right = {res[2] <- -Inf}
-  )
-
-  error = if(sides == "right") c(res[3]-res[1]) else c(res[1]-res[2])
-  names(error) <- "error"
-
-  cl = format_number(conf.level*100, 0, suffix = "%")
-  band = match.arg(band)
-
-  out = switch(band,
-               formated = paste0("(",
-                 ifelse(formated.collapse,
-                   paste0(format_number(c(res[1], error),
-                     decimal.mark = decimal.mark, nsmall = digits), collapse = " \u00b1 "),
-                   paste0(format_number(c(res[2], res[1], res[3]),
-                     decimal.mark = decimal.mark, nsmall = digits), collapse = "; ")
-                         ), "; ", cl, ")"),
-               all = c(res, error),
-               low = res[2],
-               up = res[3],
-               error = error
-  )#end-switch-band
-
-  return(out)
-}
-
-##===========================================
 ##  FRQUENCIA
 ##===========================================
 freq_tab = function(x, na.rm = FALSE, ...)
@@ -213,11 +92,8 @@ freq_tab = function(x, na.rm = FALSE, ...)
 
   setorder(FQ, -f)
 
-  FQ[#, cf := cumsum(f)][
-     , rf := f / sum(f)][
-     #, crf := cumsum(rf)][
-      , p := paste0(round(rf*100),"%")][
-     #, cp := paste0(round(crf*100),"%")][
+  FQ[, rf := f / sum(f)][
+     , p := paste0(round(rf*100),"%")][
      , paste0(group,"(f)rf") := paste0(eval(h),"(",f,")",p)]
 
   return(FQ[])
@@ -252,75 +128,11 @@ skewness = function(x, skewness.type = 2, na.rm = FALSE)
   return(out)
 }#end skewness
 
-skewness2 <- function (x,
-                       na.rm = FALSE,
-                       skewness.method = c("fisher","moment")
-){
-  if(isTRUE(na.rm)) x = x[!is.na(x)]
-  n = length(x)
-  skewness.method = match.arg(skewness.method)
-  skew <- switch(skewness.method,
-                 moment = {
-                   x <- x - mean(x)
-                   (sum(x^3)/n)/(sum(x^2)/n)^1.5
-                 },
-                 fisher = {
-                   x <- x - mean(x)
-                   ((sqrt(n * (n - 1))/(n - 2)) * (sum(x^3)/n))/((sum(x^2)/n)^1.5)
-                 })
-    skew
-}
-
 ##===========================================
-##
+## TRIMMED MEAN
 ##===========================================
-trimmed_mean = function (x, trim = .1, na.rm = FALSE)
-{
-  trim_mean = function (x, trim = .1, na.rm = TRUE)
-  {
-    if (!is.numeric(x) && !is.complex(x) && !is.logical(x)) {
-      warning("argument is not numeric or logical: returning NA")
-      return(NA_real_)
-    }
-    if (isTRUE(na.rm))
-      x <- x[!is.na(x)]
-    if (!is.numeric(trim) || length(trim) != 1L)
-      stop("'trim' must be numeric of length one")
-    n <- length(x)
-    if (trim > 0 && n) {
-      if (is.complex(x))
-        stop("trimmed means are not defined for complex data")
-      if (anyNA(x))
-        return(NA_real_)
-      if (trim >= 0.5)
-        return(stats::median(x, na.rm = FALSE))
-      lo <- floor(n * trim) + 1
-      hi <- n + 1 - lo
-      x <- sort.int(x, partial = unique(c(lo, hi)))[lo:hi]
-    }
-    mean(x)
-  }
-  sapply(trim, FUN = trim_mean, x = x, USE.NAMES = FALSE)
-}
-
-##===========================================
-##
-##===========================================
-mad2 = function (x,
-                 center = median(x),
-                 constant = 1.4826,
-                 na.rm = TRUE,
-                 low = FALSE,
-                 high = FALSE)
-{
-  if (isTRUE(na.rm)) x <- x[!is.na(x)]
-  n <- length(x)
-  constant * if ((low || high) && n%%2 == 0) {
-    if (low && high)
-      stop("'low' and 'high' cannot be both TRUE")
-    n2 <- n%/%2 + as.integer(high)
-    sort(abs(x - center), partial = n2)[n2]
-  } else median(abs(x - center))
+trimmed_mean = function (x, trim = .1, na.rm = FALSE) {
+  sapply(trim, FUN = mean, x = x, na.rm = na.rm, USE.NAMES = FALSE)
 }
 
 ##========================================
@@ -491,15 +303,8 @@ coef_params = function(x, default = NULL)
 quantile2 = function(x, probs = c(0.5), quantile.type = 7, na.rm = FALSE)
   quantile(x, probs = probs, type = quantile.type, na.rm = na.rm, names = FALSE)
 
-# stats:::quantile.default
-
 iqr = function(x, na.rm = FALSE, quantile.type = 7)
   IQR(x, na.rm = na.rm, type = quantile.type)
-
-##===========================================
-##
-##===========================================
-n_unique = function(x)length(unique(x))
 
 ##===========================================
 ##
