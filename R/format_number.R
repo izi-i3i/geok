@@ -8,43 +8,26 @@
 
 
 ##===========================================
-## COUNT_INTEGER
-##===========================================
-count_integer = function(x)
-{
-  nDigits2 <- function(x)
-  {
-    truncX <- floor(abs(x))
-    if(truncX != 0)
-      floor(log10(truncX)) + 1
-    else 1
-  }#end nDigits2
-  sapply(x, nDigits2)
-}#end n_digits
-
-##===========================================
 ##
 ##===========================================
 count_digits = function(x)
 {
-  decimalplaces <- function(x)
-  {
-#   options(scipen = 999)
-    if(is.na(x) | is.infinite(x)) return(0)
-    if (abs(x - round(x)) > .Machine$double.eps^0.5) {
-      nchar(strsplit(sub('0+$', '', format(x, scientific = F)), ".", fixed = TRUE)[[1]][[2]])
-    } else {
-      return(0)
-    }#end if
-  }#end decimalplaces
-
-  sapply(x, decimalplaces)
+  out = sapply(x,
+    function(x) {
+      if(is.na(x) | is.infinite(x)) return(0)
+      if (abs(x - round(x)) > .Machine$double.eps^0.5) {
+        nchar(strsplit(sub('0+$', '', format(x, scientific = F)), ".", fixed = TRUE)[[1]][[2]])
+      } else {
+        return(0)
+      }
+    })
+  return(out)
 }#end count_digits
 
 ##===========================================
 ##
 ##===========================================
-.fnumber = function(x,
+fnumber = function(x,
                     nsmall = NULL,
                     decimal.mark = ",",
                     preffix = NULL,
@@ -52,24 +35,26 @@ count_digits = function(x)
                     p = FALSE,
                     parse_p = FALSE,
                     suffix_p = NULL,
-                    prettyNum = FALSE,
                     ...)
 {
-  fn = c("format", "prettyNum")[1]
+  fn = "format"
 
-  if(prettyNum){
-    out = do.call("prettyNum", list(x, decimal.mark=decimal.mark, scientific = FALSE))
-    return(out)
+  comp = is.complex(x)
+  if(comp)
+  {
+    imag = Im(x)
+    imag[imag>=0] <- paste0("+",imag[imag>=0])
+    x = Re(x)
   }
 
   s = sign(x)
   x = abs(x)
 
-#   if(is.infinite(x)) x = NA
   if(is.null(nsmall)) nsmall = max(count_digits(x))
   nn = 1/10^nsmall
 
-  if(is.na(x) | is.infinite(x))
+  #if(is.na(x) | is.infinite(x))
+  if(!is.finite(x))
   {
     return(as.character(s*x))
   } else if(x >= nn ) {
@@ -105,7 +90,7 @@ count_digits = function(x)
           out = paste0("<",
                  do.call(fn, list(nn, decimal.mark = decimal.mark,
                         scientific = FALSE, trim = TRUE, ...)))
-        }#end if p
+        }#end if
 
         if(!is.null(preffix)) out = paste0(preffix, out)
         if(!is.null(suffix)) out = paste0(out, suffix)
@@ -122,12 +107,12 @@ count_digits = function(x)
           out = paste0("<",
                   do.call(fn, list(nn, decimal.mark = decimal.mark,
                          scientific = FALSE, trim = TRUE, ...)))
-        }#end if p
+        }#end if
 
         if(!is.null(preffix)) out = paste0(preffix, out)
         if(!is.null(suffix)) out = paste0(out, suffix)
-      }#end if parse_p
-    }#end if s
+      }#end if
+    }#end if
 
     if(s < 0)
     {
@@ -167,13 +152,20 @@ count_digits = function(x)
     }#end if
   }#end if
 
+    if(comp)
+    {
+      im = paste0(out,imag,"i")
+      im[grep("NA", im)] <- "NA"
+      return(im)
+    }
+
   return(out)
 }#end function fnumber
 
 ##===========================================
 ## FORMAT_NUMBER
 ##===========================================
-format_number = function(x, 
+format_number = function(x,
                          nsmall = NULL,
                          value = FALSE,
                          decimal.mark = ",",
@@ -182,7 +174,6 @@ format_number = function(x,
                          p = FALSE,
                          parse_p = FALSE,
                          suffix_p = NULL,
-                         prettyNum = FALSE,
                          ...
 ){
   if(is.null(nsmall)) nsmall = max(count_digits(x))
@@ -190,7 +181,7 @@ format_number = function(x,
   if(value) {
     out = sapply(round(x, nsmall), function(x){round(x, nsmall)})
   } else {
-    out = sapply(x, .fnumber,
+    out = sapply(x, fnumber,
                  nsmall = nsmall,
                  decimal.mark = decimal.mark,
                  preffix = preffix,
@@ -198,11 +189,8 @@ format_number = function(x,
                  p = p,
                  parse_p = parse_p,
                  suffix_p = suffix_p,
-                 prettyNum = prettyNum,
                  ...)
-#   if(percent) out = paste0(out, "%")
   }#end if
-
   return(out)
 }#end_function
 

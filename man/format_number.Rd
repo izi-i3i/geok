@@ -15,7 +15,6 @@ format_number(x,
               p = FALSE,
               parse_p = FALSE,
               suffix_p = NULL,
-              prettyNum = FALSE,
               ...)
 }
 \arguments{
@@ -30,7 +29,6 @@ format_number(x,
 \item{p}{p}
 \item{parse_p}{parse_p}
 \item{suffix_p}{suffix_p}
-\item{prettyNum}{prettyNum}
 \item{...}{further arguments passed to \code{format()}.}
 }
 \value{

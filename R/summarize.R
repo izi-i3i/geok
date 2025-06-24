@@ -378,7 +378,7 @@ ad_test = function (x)
 ##
 ##===========================================
 normality_test = function(x,
-            method.normality = c("kolmogorov.smirnov", "shapiro.wilk", "anderson.darling"),
+            method.normality = c("anderson.darling", "kolmogorov.smirnov", "shapiro.wilk"),
             na.rm = FALSE,
             ...
 ){

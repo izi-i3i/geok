@@ -7,9 +7,9 @@
 #-------------------------------------------
 medcouple <- function(x, do.reflect = "auto", na.rm = FALSE){
 
-  if(na.rm) x = x[!is.na(x)]
+  if(na.rm) x = x[is.finite(x)]
 
-  if (anyNA(x)) stop("Data with NA!\n Consider removing using 'na.rm = TRUE'")
+  if (anyNA(x)) stop("Data with NA/NaN/Inf!\n Consider removing using 'na.rm = TRUE'")
   if (is.character(x)) stop("Non-numeric argument!\n Data must be a vector or numeric matrix")
 
   x = data.matrix(x)
