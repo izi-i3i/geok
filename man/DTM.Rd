@@ -1,13 +1,13 @@
 \docType{data}
-\name{DT}
-\alias{DT}
+\name{DTM}
+\alias{DTM}
 \title{Data}
 \format{mercury}
 \source{
 data fake
 }
 \usage{
-DT
+DTM
 }
 \description{
 Data fake mercury.
