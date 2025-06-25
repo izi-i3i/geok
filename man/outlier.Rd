@@ -23,7 +23,8 @@ outliers(data,
          na.rm = FALSE,
          a = -4,
          b = 3,
-         type = 7)
+         type = 7,
+         ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -45,6 +46,7 @@ outliers(data,
   \item{a}{a}
   \item{b}{b}
   \item{type}{type}
+  \item{...}{arguments to summarize}
 }
 \value{
 

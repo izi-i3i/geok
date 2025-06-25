@@ -4,10 +4,10 @@ Version: 0.0.1
 Imports: data.table, stats, methods, ggplot2, cli, rlang, scales
 Suggests: knitr, rmarkdown
 LinkingTo: RcppEigen (>= 0.3.2.9.0), Rcpp (>= 0.12.6), RcppArmadillo (>= 0.7.600.1.0)
-Author: Izi Sousa-Filho
-Maintainer: Sousa-Filho <izi31416@protonmail.com>
+Author: Izidro Sousa-Filho
+Maintainer: Izidro Sousa-Filho <izi31416@protonmail.com>
 License: GPL (>= 2)
-Description: Analyzis and remove outliers. 
+Description: Analyzes the presence of outliers, formats numbers, breaks axis and produces a formatted summary.
 Depends: R (>= 4.0)
 Encoding: UTF-8
 Packaged: 2025-06-24 16:52:26.298 UTC; izi-i3i

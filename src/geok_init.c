@@ -1,4 +1,6 @@
-// extract from the package mrfDepth - 07/2023
+/*
+ * extract from the package mrfDepth - 2023
+ */
 
 #include <R.h>
 #include <Rinternals.h>

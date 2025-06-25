@@ -17,13 +17,13 @@ coord_trans_flip <- function(x = "identity", y = "identity", xlim = NULL, ylim =
 
   if(flip)
   {
-    ggproto(NULL, CoordTransFlip,
+    ggplot2::ggproto(NULL, CoordTransFlip,
             trans = list(x = x, y = y),
             limits = list(x = xlim, y = ylim),
             expand = expand,
             clip = clip)
   } else {
-    ggproto(NULL, CoordTrans,
+    ggplot2::ggproto(NULL, CoordTrans,
             trans = list(x = x, y = y),
             limits = list(x = xlim, y = ylim),
             expand = expand,
@@ -40,7 +40,7 @@ flip_axis_labels <- utils::getFromNamespace("flip_axis_labels", "ggplot2")
 ##===========================================
 ##
 ##===========================================
-CoordTransFlip <- ggproto("CoordTransFlip", CoordTrans,
+CoordTransFlip <- ggplot2::ggproto("CoordTransFlip", CoordTrans,
 
   transform = function(self, data, panel_params) {
     ## Need the panel params to be unflipped to correctly transform the data

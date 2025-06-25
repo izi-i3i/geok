@@ -23,7 +23,8 @@ outliers = function(
           na.rm = FALSE,
           a = -4,
           b = 3,
-          type = 7
+          type = 7,
+          ...
 ){#start-function
 
 .CLASS_=.EXTREME_=.OUTLIER_=.obs.=OBS=value_y=NULL
@@ -91,7 +92,9 @@ outliers = function(
 
   .classes_ = name.classes
 
-  if(na.rm) .DT. = .DT.[!is.na(value_y)]
+  if(na.rm) .DT. = .DT.[is.finite(value_y)]
+  if (.DT.[,anyNA(value_y)])
+    warning("Data with NA/NaN/Inf!\n Consider removing using 'na.rm = TRUE'",call. = FALSE)
   .DT.[, .obs. := 1:.N]
 
   switch(method,
@@ -211,7 +214,7 @@ outliers = function(
 
   sumario = summarize(.DT., measure.var = "value_y",
      digits = digits, na.rm = TRUE, language = language,
-     symb.body = symbs(minusplus.sign = FALSE,symb.mean = c(e="] n = ")))
+     symb.body = symbs(minusplus.sign = FALSE,symb.mean = c(e="] n = ")), ...)
 
   n_normal = .DT.[.CLASS_ == .classes_[1], .N]
   n_discrepante = .DT.[.CLASS_ == .classes_[2], .N]
