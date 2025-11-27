@@ -1,6 +1,6 @@
 Package: geok
 Title: Suport krigagem in qgis
-Version: 0.0.1
+Version: 0.0.926
 Imports: data.table, stats, methods, ggplot2, cli, rlang, scales
 Suggests: knitr, rmarkdown
 LinkingTo: RcppEigen (>= 0.3.2.9.0), Rcpp (>= 0.12.6), RcppArmadillo (>= 0.7.600.1.0)
@@ -8,7 +8,7 @@ Author: Izidro Sousa-Filho
 Maintainer: Izidro Sousa-Filho <izi31416@protonmail.com>
 License: GPL (>= 2)
 Description: Analyzes the presence of outliers, formats numbers, breaks axis and produces a formatted summary.
-Depends: R (>= 4.0)
+Depends: R (>= 4.1)
 Encoding: UTF-8
-Packaged: 2025-06-24 16:52:26.298 UTC; izi-i3i
-Date: 2025-06-24
+Packaged: 2025-11-05 04:45:14.673 UTC; izi-i3i
+Date: 2025-11-05
