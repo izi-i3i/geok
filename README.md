@@ -4,9 +4,9 @@
 
 ## Overview
 
-geok é agrupado de funções
+geok is a group of functions.
 
-- summarize
+- sumup
 - format_number
 
 ## Installation
@@ -68,5 +68,9 @@ sm[3]
 ### format_number
 
 ```R
-format_number()
+x <- c(
+  -0.000123, 0, 0.000123, 0.00123, 0.0123, 0.123, 1.23,
+  12.3, 123, 123456.789, NA, NaN, Inf, -Inf, pi
+)
+format_number(x, nsmall = 0)
 ```
