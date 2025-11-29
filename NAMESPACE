@@ -13,7 +13,6 @@ export(transf)
 export(gapbox)
 export(position_default)
 export(glocator)
-export(strip_labels)
 
 importFrom(grDevices, dev.list)
 importFrom(cowplot, as_grob)
