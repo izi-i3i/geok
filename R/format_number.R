@@ -20,7 +20,7 @@ count_digits <- function(x) {
   )
 
   return(out)
-} # end count_digits
+} # count_digits
 
 #  ===========================================
 fnumber <- function(
@@ -210,7 +210,7 @@ fnumber <- function(
   }
 
   return(out)
-} # end function fnumber
+} # fnumber
 
 # ===========================================
 format_number <- function(

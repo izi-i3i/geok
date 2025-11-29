@@ -24,7 +24,7 @@ glocator <- function(
   vjust = NULL,
   verbose = TRUE,
   plot = TRUE
-) { # start glocator
+) {
   if (is.null(dev.list())) {
     stop("No graphics device was selected or is active!")
   }

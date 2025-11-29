@@ -35,6 +35,13 @@ stat_n <- function(
     position = position,
     inherit.aes = inherit.aes,
     show.legend = show.legend,
-    params = list(prefix = prefix, ypos = ypos, na.rm = na.rm, vjust = vjust, color = color, ...)
+    params = list(
+      prefix = prefix,
+      ypos = ypos,
+      na.rm = na.rm,
+      vjust = vjust,
+      color = color,
+      ...
+    )
   )
 }

@@ -1,6 +1,8 @@
 %
 \name{scale_transf_continuous}
 \alias{scale_transf_continuous}
+\alias{gapbox}
+\alias{position_default}
 \title{Scale transf continuous}
 \description{
   \code{coord_trans_flip()} is different to scale transformations in that it occurs after
@@ -8,25 +10,38 @@
   no guarantee that straight lines will continue to be straight.
 }
 \usage{
-scale_transf_continuous(cut_axis = c("y", "x"),
-                        cuts = 0,
-                        k = 1,
-                        gap = 0,
-                        name = waiver(),
-                        breaks = pretty_transf(cuts, k, gap),
-                        minor_breaks = waiver(),
-                        n.breaks = NULL,
-                        labels = waiver(),
-                        limits = NULL,
-                        position = position_default(cut_axis),
-                        expand = waiver(),
-                        oob = scales::censor,
-                        na.value = NA_real_,
-                        guide = waiver(),
-                        sec.axis = waiver(),
-                        line.axis = line_axis(),
-                        gap.box = gap_box(),
-                        ...)
+  scale_transf_continuous(
+    cut_axis = c("y", "x"),
+    cuts = 0,
+    k = 1,
+    gap = 0,
+    name = waiver(),
+    breaks = waiver(), # pretty_transf(cuts, k, gap),
+    minor_breaks = waiver(),
+    n.breaks = NULL,
+    labels = waiver(),
+    limits = NULL,
+    position = position_default(cut_axis),
+    expand = waiver(),
+    oob = scales::censor,
+    na.value = NA_real_,
+    guide = waiver(),
+    sec.axis = waiver(),
+    axis_line = axisline(),
+    gap_box = gapbox(),
+    ...
+  )
+
+  gapbox(
+    ...,
+    fill = "white",
+    size = 1,
+    color = "gray55",
+    linetype = 1
+  )
+
+position_default(p = c("y", "x"))
+
 }
 \arguments{
 \item{cut_axis}{Which axis to break, x or y.}
@@ -104,11 +119,21 @@ Also accepts rlang \link[rlang:as_function]{lambda} function notation.
 
 \item{sec.axis}{\code{\link[=sec_axis]{sec_axis()}} is used to specify a secondary axis.}
 
-\item{line.axis}{line.axis}
+\item{axis_line}{axis}
 
-\item{gap.box}{gap.box}
+\item{gap_box}{gap box}
 
-\item{\ldots}{Other arguments passed on to \verb{scale_(x|y)_continuous()}}
+\item{\ldots}{
+  Other arguments passed on to \verb{scale_(x|y)_continuous()}.
+  For gapbox is
+}
+
+\item{fill}{fill}
+\item{size}{size}
+\item{color}{color}
+\item{linetype}{line}
+
+\item{p}{y or x}
 }
 \details{
 Transformations only work with continuous values: see

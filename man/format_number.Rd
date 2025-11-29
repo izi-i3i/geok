@@ -6,16 +6,18 @@
 Format an R object for pretty printing.
 }
 \usage{
-format_number(x,
-              nsmall = NULL,
-              value = FALSE,
-              decimal.mark = ",",
-              preffix = NULL,
-              suffix = NULL,
-              p = FALSE,
-              parse_p = FALSE,
-              suffix_p = NULL,
-              ...)
+format_number(
+  x,
+  nsmall = NULL,
+  value = FALSE,
+  decimal_mark = ",",
+  preffix = NULL,
+  suffix = NULL,
+  p = FALSE,
+  parse_p = FALSE,
+  suffix_p = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{a vector of real numbers.}
@@ -23,7 +25,7 @@ format_number(x,
           in formatting real/complex numbers in non-scientific formats.
           Allowed values are '0 <= nsmall <= 20'.}
 \item{value}{value}
-\item{decimal.mark}{decimal.mark}
+\item{decimal_mark}{decimal.mark}
 \item{preffix}{preffix}
 \item{suffix}{suffix}
 \item{p}{p}

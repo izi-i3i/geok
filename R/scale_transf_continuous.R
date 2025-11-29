@@ -605,7 +605,10 @@ scale_transf_continuous <- function(
   )
 
   # theme: remove axis.line and panel border
-  arg_theme <- list(axis.line = element_blank(), panel.border = element_blank())
+  arg_theme <- list(
+    axis.line = element_blank(),
+    panel.border = element_blank()
+  )
 
   list(
     layer(

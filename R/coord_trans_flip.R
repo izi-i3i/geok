@@ -4,8 +4,15 @@
 #-------------------------------------------
 
 # ===========================================
-coord_trans_flip <- function(x = "identity", y = "identity", xlim = NULL, ylim = NULL,
-                             clip = "on", expand = TRUE, flip = FALSE) {
+coord_trans_flip <- function(
+  x = "identity",
+  y = "identity",
+  xlim = NULL,
+  ylim = NULL,
+  clip = "on",
+  expand = TRUE,
+  flip = FALSE
+) {
   # resolve transformers
   if (is.character(x)) x <- scales::as.trans(x)
   if (is.character(y)) y <- scales::as.trans(y)

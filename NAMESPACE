@@ -1,94 +1,91 @@
 
+# 
+export(sumup)
 export(medcouple)
 export(format_number)
 export(outliers)
-export(summarize)
 export(symbs)
 export(stat_n)
-
-# function ggplot2 custom
-export(coord_trans_flip)
-export(geom_boxplot2)
-export(stat_boxplot2)
-
-#export(check_number_decimal)
-
-# scale_transf_continuous
 export(scale_transf_continuous)
+export(coord_trans_flip)
 export(transf_trans)
 export(transf)
-export(line_axis)
 export(gapbox)
-export(pretty_transf)
 export(position_default)
+export(glocator)
+export(strip_labels)
 
+importFrom(grDevices, dev.list)
+importFrom(cowplot, as_grob)
 
-importFrom("grDevices", "dev.list")
 importFrom(stats,
-          complete.cases,
-          mad,
-          rf,
-          sd,
-          var,
-          qnorm,
-          qt,
-          pnorm,
-          quantile,
-          median,
-          ks.test,
-          shapiro.test,
-          IQR)
+  complete.cases,
+  mad,
+  rf,
+  sd,
+  var,
+  qnorm,
+  qt,
+  pnorm,
+  quantile,
+  median,
+  ks.test,
+  shapiro.test,
+  IQR
+)
 
 importFrom(data.table,
-          data.table,
-          setnames,
-          melt,
-          dcast,
-          setkeyv,
-          .SD,
-          ':=',
-          .N,
-          setDT,
-          copy,
-          setorder,
-          is.data.table,
-          as.data.table,
-          setindex)
+  data.table,
+  setnames,
+  melt,
+  dcast,
+  setkeyv,
+  .SD,
+  ':=',
+  .N,
+  setDT,
+  copy,
+  setorder,
+  is.data.table,
+  as.data.table,
+  setindex
+)
 
-import(ggplot2)
-#importFrom(ggplot2,
-#          StatIdentity,
-#          waiver,
-#          ggproto,
-#          draw_key_boxplot,
-#          Geom,
-#          position_dodge2,
-#          layer,
-#          Stat,
-#          draw_key_blank,
-#          GeomBlank,
-#          CoordTrans,
-#          PositionIdentity,
-#          aes,
-#          guide_axis,
-#          sec_axis,
-#          theme,
-#          element_rect,
-#          unit,
-#          margin,
-#          element_text,
-#          element_line,
-#          element_blank,
-#          labs,
-#          geom_hline,
-#          geom_point,
-#          geom_text,
-#          ggplot,
-#          guide_legend,
-#          guides,
-#          scale_fill_manual,
-#          scale_x_continuous,
-#          scale_y_continuous)
+#import(ggplot2)
+importFrom(ggplot2,
+  StatIdentity,
+  waiver,
+  ggproto,
+  draw_key_boxplot,
+  Geom,
+  position_dodge2,
+  layer,
+  Stat,
+  draw_key_blank,
+  GeomBlank,
+  CoordTrans,
+  PositionIdentity,
+  aes,
+  guide_axis,
+  sec_axis,
+  theme,
+  element_rect,
+  unit,
+  margin,
+  element_text,
+  element_line,
+  element_blank,
+  labs,
+  geom_hline,
+  geom_point,
+  geom_text,
+  ggplot,
+  guide_legend,
+  guides,
+  scale_fill_manual,
+  scale_x_continuous,
+  scale_y_continuous
+)
 
 importFrom(methods, formalArgs)
 

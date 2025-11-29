@@ -268,7 +268,7 @@ outliers <- function(
   setindex(.DT., NULL)
   setindex(.DT., .obs.)
 
-  sumario <- summarize(
+  sumario <- sumup(
     .DT.,
     measure.var = "value_y",
     digits = digits,

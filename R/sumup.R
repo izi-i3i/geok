@@ -1,12 +1,9 @@
 #-------------------------------------------
 # Author  : Izi (izi31416@protonmail.com)
-# Created : 8 de set de 2018
-# Updated : sáb 07 nov 2020 23:56:26 -03
-#         : qua 19 nov 2025 10:23:09
+# Created : 8 de set de 2018 23:56:26 -03
 #-------------------------------------------
 
-
-# ===========================================
+# standard_error ============================
 standard_error <- function(x, na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -15,7 +12,7 @@ standard_error <- function(x, na.rm = FALSE) {
   sd(x) / sqrt(n)
 } # end standard_error
 
-# ===========================================
+# idots =====================================
 indots <- function(arg, default, ...) {
   dots <- list(...)
   out <- unlist(dots[arg])
@@ -25,7 +22,7 @@ indots <- function(arg, default, ...) {
   out
 }
 
-# ===========================================
+# match_dots ================================
 match_dots <- function(args, fn, arg.rm = "") {
   fa <- formalArgs(args(fn))
   #' rmv <- match(arg.rm, names(args))
@@ -34,8 +31,7 @@ match_dots <- function(args, fn, arg.rm = "") {
   args[ag[!is.na(ag)]]
 }
 
-
-# ===========================================
+# winsorize =================================
 winsorize <- function(
   x,
   minval = NULL,
@@ -58,7 +54,7 @@ winsorize <- function(
   return(x)
 }
 
-# ===========================================
+# winvar ====================================
 winvar <- function(x, trim.ci) {
   if (any(is.na(x))) {
     return(NA_real_)
@@ -72,7 +68,7 @@ winvar <- function(x, trim.ci) {
   return(c(var = winvar, df = df))
 }
 
-# ===========================================
+# freq_tab ==================================
 freq_tab <- function(x, na.rm = FALSE, ...) {
   . <- f <- p <- NULL
   h <- substitute(x)
@@ -97,7 +93,7 @@ freq_tab <- function(x, na.rm = FALSE, ...) {
   return(FQ[])
 } # end freq_tab
 
-# ===========================================
+# kurtosis ==================================
 kurtosis <- function(x, kurtosis.type = 2, na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -113,7 +109,7 @@ kurtosis <- function(x, kurtosis.type = 2, na.rm = FALSE) {
   return(out)
 } # end kurtosis
 
-# ===========================================
+# skewness ==================================
 skewness <- function(x, skewness.type = 2, na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -129,78 +125,68 @@ skewness <- function(x, skewness.type = 2, na.rm = FALSE) {
   return(out)
 } # end skewness
 
-# ===========================================
+# trimmed_mean ==============================
 trimmed_mean <- function(x, trim = .1, na.rm = FALSE) {
   sapply(trim, FUN = mean, x = x, na.rm = na.rm, USE.NAMES = FALSE)
 }
 
-# ========================================
+# amplitude =================================
 amplitude <- function(x, na.rm = FALSE) {
   return(max(x, na.rm = na.rm) - min(x, na.rm = na.rm))
 }
 
-# ========================================
+# coef_var ==================================
 coef_var <- function(x, na.rm = FALSE) {
   return(sd(x, na.rm = na.rm) / mean(x, na.rm = na.rm))
 }
 
-# ========================================
-missing_count <- function(x, missing.val = NA, action = c("<=", "=", ">=")) {
+# miss ======================================
+miss <- function(
+  x,
+  missing.val = NA,
+  action = c("<=", "=", ">=")
+) {
   action <- match.arg(action)
 
   out <- switch(action,
     "=" = {
-      missing.val <- sum(x %in% missing.val)
+      list(
+        sum(x %in% missing.val),
+        x %in% missing.val
+      )
     },
     "<=" = {
       if (length(missing.val) == 1 & any(is.na(missing.val))) {
-        sum(is.na(x))
+        list(
+          sum(is.na(x)),
+          is.na(x)
+        )
       } else {
-        sum(is.na(x)) + sum(x <= max(missing.val, na.rm = TRUE), na.rm = TRUE)
+        list(
+          sum(is.na(x)) + sum(x <= max(missing.val, na.rm = TRUE), na.rm = TRUE),
+          x <= max(missing.val, na.rm = TRUE)
+        )
       }
     },
     ">=" = {
       if (length(missing.val) == 1 & any(is.na(missing.val))) {
-        sum(is.na(x))
+        list(
+          sum(is.na(x)),
+          is.na(x)
+        )
       } else {
-        sum(is.na(x)) + sum(x >= max(missing.val, na.rm = TRUE), na.rm = TRUE)
+        list(
+          sum(is.na(x)) + sum(x >= max(missing.val, na.rm = TRUE), na.rm = TRUE),
+          x >= max(missing.val, na.rm = TRUE)
+        )
       }
     }
   ) # end switch
+  names(out) <- c("count", "missing")
   return(out)
-} # end missing_count
+} # end missing
 
-# ===========================================
-missing_rm <- function(x, missing.val = NULL, action = c("<=", "=", ">=")) {
-  if (is.null(missing.val)) {
-    return(FALSE)
-  }
-
-  action <- match.arg(action)
-
-  out <- switch(action,
-    "=" = {
-      x %in% missing.val
-    },
-    "<=" = {
-      if (length(missing.val) == 1 & any(is.na(missing.val))) {
-        missing.val <- is.na(x)
-      } else {
-        x <= max(missing.val, na.rm = TRUE)
-      }
-    },
-    ">=" = {
-      if (length(missing.val) == 1 & any(is.na(missing.val))) {
-        missing.val <- is.na(x)
-      } else {
-        x >= max(missing.val, na.rm = TRUE)
-      }
-    },
-  ) # end switch
-  return(out)
-} # end missing_count
-
-# ===========================================
+# interval_range ============================
 interval_range <- function(x, digits = 2, decimal.mark = ",", na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -234,15 +220,15 @@ interval_range <- function(x, digits = 2, decimal.mark = ",", na.rm = FALSE) {
   return(res)
 } # end interval_range
 
-# ===========================================
+# coef_params ===============================
 coef_params <- function(x, default = NULL) {
   sx <- as.character(substitute(x))
 
   if (is.null(default)) {
     default <- c(
-      Total.N = "Total.N",
+      Total_N = "Total_N",
       Missing = "Missing",
-      Valid.N = "Valid.N",
+      Valid_N = "Valid_N",
       Min = "Min",
       Q1 = "Q1",
       Median = "Median",
@@ -309,7 +295,7 @@ coef_params <- function(x, default = NULL) {
   return(list("changed" = valid_names, "vector" = vec))
 }
 
-# ===========================================
+# quantile2 =================================
 quantile2 <- function(x, probs = c(0.5), quantile.type = 7, na.rm = FALSE) {
   quantile(x, probs = probs, type = quantile.type, na.rm = na.rm, names = FALSE)
 }
@@ -318,7 +304,7 @@ iqr <- function(x, na.rm = FALSE, quantile.type = 7) {
   IQR(x, na.rm = na.rm, type = quantile.type)
 }
 
-# ===========================================
+# symbs =====================================
 symbs <- function(
   symb.mean = NULL,
   symb.median = NULL,
@@ -329,19 +315,54 @@ symbs <- function(
 ) {
   smean <-
     if (minusplus.sign) {
-      c(a = "", b = " \u00b1 ", c = " (", d = " - ", e = ") ", f = "")
+      c(
+        a = "",
+        b = " \u00b1 ",
+        c = " (",
+        d = " - ",
+        e = ") ",
+        f = ""
+      )
     } else {
-      c(a = "", b = " (", c = ") [", d = "; ", e = "] ", f = "")
+      c(
+        a = "",
+        b = " (",
+        c = ") [",
+        d = "; ",
+        e = "] ",
+        f = ""
+      )
     }
   smean[names(symb.mean)] <- symb.mean
 
-  smedian <- c(a = "", b = " (", c = ") [", d = "; ", e = "] ", f = "")
+  smedian <- c(
+    a = "",
+    b = " (",
+    c = ") [",
+    d = "; ",
+    e = "] ",
+    f = ""
+  )
   smedian[names(symb.median)] <- symb.median
 
-  sfive <- c(a = "", b = " | ", c = " | ", d = " | ", e = " | ", f = " | ")
+  sfive <- c(
+    a = "",
+    b = " | ",
+    c = " | ",
+    d = " | ",
+    e = " | ",
+    f = " | "
+  )
   sfive[names(symb.five)] <- symb.five
 
-  scustom <- c(a = "", b = " | ", c = " | ", d = " | ", e = " | ", f = "")
+  scustom <- c(
+    a = "",
+    b = " | ",
+    c = " | ",
+    d = " | ",
+    e = " | ",
+    f = ""
+  )
   scustom[names(symb.custom)] <- symb.custom
 
   list(
@@ -352,7 +373,7 @@ symbs <- function(
   )
 }
 
-# ===========================================
+# ad_test ===================================
 ad_test <- function(x) {
   dname <- deparse(substitute(x))
   x <- sort(x[complete.cases(x)])
@@ -390,7 +411,7 @@ ad_test <- function(x) {
   return(rval)
 }
 
-# ===========================================
+# normality_test ============================
 normality_test <- function(
   x,
   method.normality = c(
@@ -459,10 +480,8 @@ normality_test <- function(
   return(out)
 }
 
-## ===========================================
-## SUMARIO
-## ===========================================
-summarize <- function(
+# sumup =================================
+sumup <- function(
   x,
   measure.var,
   group.by = NULL,
@@ -485,7 +504,7 @@ summarize <- function(
   symb.body = symbs(),
   ...
 ) {
-  . <- Missing <- Total.N <- Valid.N <- id <- m_rm <- NULL
+  . <- Missing <- Total_N <- Valid_N <- id <- NULL
 
   dots <- list(...)
   n_probs <- length(dots$probs)
@@ -521,48 +540,45 @@ summarize <- function(
 
     mvar <- measure.var
     measure.var <- str2lang(measure.var)
-    # if (!is.null(interval)) {
-    #   group_parse <- parse(text = interval)
-    # }
     setDT(x)
     DT <- copy(x)
   } # endif
 
+  # total n
   total_n <- DT[, .N]
 
+  # missing count
   miss_count <- DT[
     ,
     do.call(
-      "missing_count",
+      "miss",
       c(
         list(x = eval(measure.var), missing.val = missing.val),
-        match_dots(dots, missing_count)
+        match_dots(dots, miss)
       )
-    )
+    )[[1]]
   ]
 
-  if (missing.rm || TRUE) {
-    DT[
-      ,
-      m_rm := do.call(
-        "missing_rm",
+  # remove missing
+  if (missing.rm) {
+    DT <- DT[
+      !do.call(
+        "miss",
         c(
           list(x = eval(measure.var), missing.val = missing.val),
-          match_dots(dots, missing_rm)
+          match_dots(dots, miss)
         )
-      )
+      )[[2]]
     ]
-    DT <- DT[m_rm == isTRUE(m_rm)]
-    DT[, m_rm := NULL]
   }
 
   DT <- DT[, .SD, .SDcols = unique(c(group.by, mvar, interval))]
 
   dt_names <- names(copy(DT))
 
-  # Total.N  - Total samples
+  # Total_N  - Total samples
   # Missing  - Missing values
-  # Valid.N  - N samples
+  # Valid_N  - N samples
   # Min      - Minimum
   # Max      - Maximum
   # Median   - Median
@@ -581,9 +597,9 @@ summarize <- function(
   # Normality - Normality test
 
   edn <- c(
-    "Total.N",
+    "Total_N",
     "Missing",
-    "Valid.N",
+    "Valid_N",
     "Min",
     "Max",
     "Median",
@@ -608,43 +624,55 @@ summarize <- function(
   names(paste_names) <- equal_names
   edn[equal_names] <- paste_names
 
-
+  # summary
   DT[,
     c(edn) := list(
-      total_n, # .N,
-      miss_count,
-      NA, # Valid.N
-      do.call("min", c(list(x = eval(measure.var)), match_dots(dots, min))),
-      do.call("max", c(list(x = eval(measure.var)), match_dots(dots, max))),
-      do.call(
+      total_n, # Total_N
+      miss_count, # Missing
+      NA, # Valid_N
+      do.call( # Min
+        "min",
+        c(list(x = eval(measure.var)), match_dots(dots, min))
+      ),
+      do.call( # Max
+        "max",
+        c(list(x = eval(measure.var)), match_dots(dots, max))
+      ),
+      do.call( # Median
         "median",
         c(list(x = eval(measure.var)), match_dots(dots, median))
       ),
-      do.call(
+      do.call( # SAM (Simple Arithmetic Mean)
         "mean.default",
         c(
           list(x = eval(measure.var), trim = 0),
           match_dots(dots, mean.default, arg.rm = "trim")
         )
       ),
-      do.call(
+      do.call( # TM10 Trimmed Mean 10%
         "mean.default",
         c(
           list(x = eval(measure.var), trim = 0.1),
           match_dots(dots, mean.default, arg.rm = "trim")
         )
       ),
-      do.call("mad", c(list(x = eval(measure.var)), match_dots(dots, mad))),
-      do.call("sd", c(list(eval(measure.var)), match_dots(dots, sd))),
-      do.call(
+      do.call( # MAD
+        "mad",
+        c(list(x = eval(measure.var)), match_dots(dots, mad))
+      ),
+      do.call( # SD
+        "sd",
+        c(list(eval(measure.var)), match_dots(dots, sd))
+      ),
+      do.call( # SE
         "standard_error",
         c(list(x = eval(measure.var)), match_dots(dots, standard_error))
       ),
-      do.call(
+      do.call( # CV
         "coef_var",
         c(list(x = eval(measure.var)), match_dots(dots, coef_var))
       ),
-      tryCatch(
+      tryCatch( # Q25
         {
           do.call(
             "quantile2",
@@ -658,7 +686,7 @@ summarize <- function(
           NA_real_
         }
       ),
-      tryCatch(
+      tryCatch( # Q75
         {
           do.call(
             "quantile2",
@@ -672,7 +700,7 @@ summarize <- function(
           NA_real_
         }
       ),
-      tryCatch(
+      tryCatch( # IQR
         {
           do.call(
             "iqr",
@@ -686,19 +714,19 @@ summarize <- function(
           NA_real_
         }
       ),
-      do.call(
+      do.call( # Range
         "amplitude",
         c(list(x = eval(measure.var)), match_dots(dots, amplitude))
       ),
-      do.call(
+      do.call( # Skewness
         "skewness",
         c(list(x = eval(measure.var)), match_dots(dots, skewness))
       ),
-      do.call(
+      do.call( # Kurtosis
         "kurtosis",
         c(list(x = eval(measure.var)), match_dots(dots, kurtosis))
       ),
-      do.call(
+      do.call( # Normality
         "normality_test",
         c(
           list(x = eval(measure.var)),
@@ -709,12 +737,13 @@ summarize <- function(
     by = group.by
   ]
 
-  DT[, Valid.N := Total.N - Missing]
+  # Valid_N
+  DT[, Valid_N := Total_N - Missing]
 
   qdots <- match_dots(dots, quantile2)
   qprob <- qdots[names(qdots) == "probs"]
 
-  # PROBS - quantile
+  # dots - probs - quantile
   if (!is.null(dots$probs)) {
     for (i in seq_along(n_probs)) {
       DT[,
@@ -739,7 +768,7 @@ summarize <- function(
     }
   }
 
-  # TRIM - mean.default
+  # dots - trim - mean.default
   trm <- match_dots(dots, mean.default)
   if ("trim" %in% names(trm)) {
     for (i in 1:n_trim) {
@@ -829,7 +858,7 @@ summarize <- function(
   }
   # id auxiliar
   NUM[, id := seq_len(.N)]
-  # cabeça NUM
+  # head - NUM
   HEAD <- NUM[, .SD, .SDcols = !parametros]
 
   for (i in seq_along(param_ft)) {
@@ -879,22 +908,21 @@ summarize <- function(
     params <- parametros
   }
   names(params) <- params
-  # old_params <- params
   params <- coef_params(params, parametros)[[1]]
 
   if (language == "pt") {
     params_names <- c(
-      Total.N = "N.Total",
-      Missing = "Valor.Faltante",
-      Valid.N = "N.Amostral",
+      Total_N = "N_Total",
+      Missing = "Valor_Faltante",
+      Valid_N = "N_Amostral",
       Min = "M\u00Ednimo",
       Max = "M\u00E1ximo",
       Median = "Mediana",
       SAM = "M\u00E9dia",
       TM10 = "MT10",
       MAD = "DAM",
-      SD = "Desvio.Padr\u00E3o",
-      SE = "Erro.Padr\u00E3o",
+      SD = "Desvio_Padr\u00E3o",
+      SE = "Erro_Padr\u00E3o",
       CV = "CV",
       Q25 = "Q25",
       Q75 = "Q75",
@@ -997,7 +1025,7 @@ summarize <- function(
     if (is.null(group.by)) {
       group.by <- 1
     }
-    A <- NUM[, .SD, .SDcols = group.by] # !is.numeric]
+    A <- NUM[, .SD, .SDcols = group.by]
 
     def <- names(fn)
     if (is.null(def) && language == "en") {
@@ -1061,8 +1089,8 @@ summarize <- function(
     return(SMY)
   } # end five_numbers
 
-  mean_def <- edn[c("SAM", "SD", "Min", "Max", "Valid.N")]
-  median_def <- edn[c("Median", "MAD", "Min", "Max", "Valid.N")]
+  mean_def <- edn[c("SAM", "SD", "Min", "Max", "Valid_N")]
+  median_def <- edn[c("Median", "MAD", "Min", "Max", "Valid_N")]
   five_def <- edn[c("Min", "Q25", "Median", "Q75", "Max")]
 
   mean5 <- params.names[mean_def]
@@ -1149,4 +1177,4 @@ summarize <- function(
   }
 
   return(out)
-} # end summarize
+} # end sumup
