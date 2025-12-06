@@ -6,11 +6,14 @@
 transf(g = 0, k = 1)
 }
 \arguments{
-\item{g}{bla}
+  \item{g}{
+    bla
+  }
 
-\item{k}{blabla}
-
+  \item{k}{
+    blabla
+  }
 }
 \description{
-blabla
+  blabla
 }

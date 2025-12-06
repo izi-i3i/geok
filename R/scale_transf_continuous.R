@@ -6,19 +6,7 @@
 # Updated : dom 23 out 2022 01:32:06 -03
 #------------------------------------------------------------------------
 
-# REFERENCIAS =============================================================
-# Estudo de Distorção
-# John, J. A., & Draper, N. R. (1980). An Alternative Family of
-# Transformations. Journal of the Royal Statistical Society.
-# Series C (Applied Statistics), 29(2), 190–197.
-# https://doi.org/10.2307/2986305
-
-# Package ggbreak
-# S Xu, M Chen#, T Feng, L Zhan, L Zhou, G Yu*. Use ggbreak to effectively
-# utilize plotting space to deal with large datasets and outliers. Frontiers in
-# Genetics. 2021, 12:774846. https://doi.org/10.3389/fgene.2021.774846
-
-# ROTATE ====================================
+# rotate ====================================
 rotate <- function(
   x,
   angle = c("180", "90"),
@@ -36,37 +24,49 @@ rotate <- function(
   )
 
   out
-} # end flip
+}
 
-# EVEN-ODD ==================================
+# even-odd ==================================
 is_even <- function(x) x %% 2 == 0 # par
 is_odd <- function(x) x %% 2 != 0 # impar
 
-# SWAP ======================================
+# swap ======================================
 swap <- function(x) {
   d1 <- dim(x)[1]
   d2 <- dim(x)[2]
-  if (is.vector(x)) h1 <- seq_along(x) else h1 <- seq_len(d1)
+  if (is.vector(x)) {
+    h1 <- seq_along(x)
+  } else {
+    h1 <- seq_len(d1)
+  }
   h <- h1[is_odd(h1)]
   a <- NULL
-  for (i in h) a <- c(a, c(h1[i + 1], h1[i]))
-  if (is.vector(x)) x <- x[a] else x[, 1:d2] <- x[a, ]
+  for (i in h) {
+    a <- c(a, c(h1[i + 1], h1[i]))
+  }
+  if (is.vector(x)) {
+    x <- x[a]
+  } else {
+    x[, 1:d2] <- x[a, ]
+  }
   x
-} # end swap
+}
 
-# ===========================================
+# position_default ==========================
 position_default <- function(p = c("y", "x")) {
   p <- match.arg(p)
   ifelse(p == "y", "left", "bottom")
 }
 
-# ===========================================
+# transf ====================================
 transf <- function(g = 0, k = 1) {
   function(x, ...) {
     ng <- length(g)
     nk <- length(k)
 
-    if (nk < ng) k <- rep(k[1], ng)
+    if (nk < ng) {
+      k <- rep(k[1], ng)
+    }
 
     for (i in seq_len(ng)) {
       if (g[i] > 0) {
@@ -74,18 +74,20 @@ transf <- function(g = 0, k = 1) {
       } else {
         x <- pmax(x, g[i]) + k[i] * pmin(x - g[i], 0)
       }
-    } # end for
+    }
     x
-  } # end function
-} # end transf
+  }
+}
 
-# ===========================================
+# transf_inv ================================
 transf_inv <- function(g = 0, k = 1) {
   function(x, ...) {
     ng <- length(g)
     nk <- length(k)
 
-    if (nk < ng) k <- rep(k[1], ng)
+    if (nk < ng) {
+      k <- rep(k[1], ng)
+    }
 
     for (i in rev(seq_len(ng))) {
       if (g[i] > 0) {
@@ -93,13 +95,12 @@ transf_inv <- function(g = 0, k = 1) {
       } else {
         x <- pmax(x, g[i]) + pmin(x - g[i], 0) / k[i]
       }
-    } # end for
+    }
     x
-  } # end function
-} # end transf_inv
+  }
+}
 
-
-# ===========================================
+# transf_trans ==============================
 transf_trans <- function(g = 0, k = 1) {
   scales::trans_new(
     name = "transf",
@@ -110,18 +111,23 @@ transf_trans <- function(g = 0, k = 1) {
     format = scales::label_number(),
     domain = c(-Inf, Inf)
   )
-} # end transf_trans
+}
 
-# ===========================================
+# gapend ====================================
 gapend <- function(g, p) {
   np <- length(p)
   ng <- length(g)
-  if (np < ng) p <- rep(p[1], ng)
-  res <- sapply(g, function(x, p) {
-    x + x * p
-  }, p)
+  if (np < ng) {
+    p <- rep(p[1], ng)
+  }
+  res <- sapply(
+    g,
+    function(x, p) {
+      x + x * p
+    },
+    p
+  )
   out <- diag(as.matrix(res))
-
   out
 }
 
@@ -153,8 +159,12 @@ setlines <- function(x, default) {
   #' default_type <- default
 
   if (is.null(xname)) {
-    if (nx == 1) default <- rep(x[1], ndef)
-    if (nx <= (ndef - 1)) default <- c(x, default[(nx + 1):ndef])
+    if (nx == 1) {
+      default <- rep(x[1], ndef)
+    }
+    if (nx <= (ndef - 1)) {
+      default <- c(x, default[(nx + 1):ndef])
+    }
     default <- default[1:ndef]
     names(default) <- dname[1:ndef]
   } else {
@@ -176,7 +186,8 @@ setlines <- function(x, default) {
         "In axisline(), ignoring parameters: '%s'\n",
         "Axis can be specified either text: %s"
       ),
-      igs, dn
+      igs,
+      dn
     )
     warning(msg, call. = FALSE)
   }
@@ -186,12 +197,22 @@ setlines <- function(x, default) {
 # ===========================================
 char_num_lty <- function(lty) {
   ltn <- c(
-    "blank" = 0, "solid" = 1, "dashed" = 2, "dotted" = 3,
-    "dotdash" = 4, "longdash" = 5, "twodash" = 6
+    "blank" = 0,
+    "solid" = 1,
+    "dashed" = 2,
+    "dotted" = 3,
+    "dotdash" = 4,
+    "longdash" = 5,
+    "twodash" = 6
   )
   ltc <- c(
-    "blank", "solid", "dashed", "dotted",
-    "dotdash", "longdash", "twodash"
+    "blank",
+    "solid",
+    "dashed",
+    "dotted",
+    "dotdash",
+    "longdash",
+    "twodash"
   )
   cha <- NULL
   num <- NULL
@@ -249,7 +270,6 @@ axisline <- function(
   out
 }
 
-
 # ===========================================
 gapbox <- function(
   ...,
@@ -288,7 +308,9 @@ draw_panel_fun <- function(
 ) {
   ## line axis
   size_axis <- axis_line[["size"]]
-  if (panel_params$clip == "off") size_axis <- size_axis / 2
+  if (panel_params$clip == "off") {
+    size_axis <- size_axis / 2
+  }
 
   col_axis <- axis_line[["color"]]
   lty_axis <- axis_line[["linetype"]]
@@ -296,7 +318,9 @@ draw_panel_fun <- function(
   # verifcar se é flip
   flip <- class(
     panel_params
-  )[1] == "CoordFlip" | class(panel_params)[1] == "CoordTransFlip"
+  )[1] ==
+    "CoordFlip" |
+    class(panel_params)[1] == "CoordTransFlip"
 
   yr <- panel_scales$y.range
   xr <- panel_scales$x.range
@@ -327,7 +351,9 @@ draw_panel_fun <- function(
     yd <- if (is.null(yd)) FALSE else TRUE
   }
 
-  if (length(cuts) < length(gap)) gap <- gap[1]
+  if (length(cuts) < length(gap)) {
+    gap <- gap[1]
+  }
 
   if (cut_axis == "x") {
     ss <- swap(names(size_axis))
@@ -337,7 +363,11 @@ draw_panel_fun <- function(
     names(col_axis) <- sc
     names(lty_axis) <- sl
 
-    if (!flip) pr <- xr else pr <- yr
+    if (!flip) {
+      pr <- xr
+    } else {
+      pr <- yr
+    }
 
     if (flip && x_reverse && y_reverse) {
       nc <- -1
@@ -357,7 +387,8 @@ draw_panel_fun <- function(
     } else if (!flip && !x_reverse && y_reverse) {
       nc <- 1
       #'' lx <- "xf"
-    } else if (flip && x_reverse && !y_reverse) { # NOTE: confirmar
+    } else if (flip && x_reverse && !y_reverse) {
+      # NOTE: confirmar
       nc <- 1
       #'' lx <- "xg"
     } else {
@@ -370,8 +401,12 @@ draw_panel_fun <- function(
     if (!is.null(ppx)) {
       fun <- gsub("-.*", "", ppx)
       base <- gsub("log-", "", ppx)
-      if (fun == "log") base <- as.numeric(base)
-      if (fun == "log") cuts <- do.call(fun, list(cuts, base))
+      if (fun == "log") {
+        base <- as.numeric(base)
+      }
+      if (fun == "log") {
+        cuts <- do.call(fun, list(cuts, base))
+      }
       if (fun == "sqrt") cuts <- do.call(fun, list(cuts))
     }
   }
@@ -379,7 +414,11 @@ draw_panel_fun <- function(
   #'' ly <- ""
 
   if (cut_axis == "y") {
-    if (flip) pr <- xr else pr <- yr
+    if (flip) {
+      pr <- xr
+    } else {
+      pr <- yr
+    }
 
     if (flip && x_reverse && y_reverse) {
       nc <- -1
@@ -412,8 +451,12 @@ draw_panel_fun <- function(
     if (!is.null(ppy)) {
       fun <- gsub("-.*", "", ppy)
       base <- gsub("log-", "", ppy)
-      if (fun == "log") base <- as.numeric(base)
-      if (fun == "log") cuts <- do.call(fun, list(cuts, base))
+      if (fun == "log") {
+        base <- as.numeric(base)
+      }
+      if (fun == "log") {
+        cuts <- do.call(fun, list(cuts, base))
+      }
       if (fun == "sqrt") cuts <- do.call(fun, list(cuts))
     }
   }
@@ -465,7 +508,9 @@ draw_panel_fun <- function(
   ## top
   v_4 <- rbind(x0 = 0, x1 = 1, y0 = 1, y1 = 1)
 
-  if (cut_axis == "x") flip <- !flip
+  if (cut_axis == "x") {
+    flip <- !flip
+  }
 
   if (flip) {
     hl <- rotate(hl) # horizontal lines
@@ -483,7 +528,10 @@ draw_panel_fun <- function(
 
   ## cut lines
   hl <- grid::segmentsGrob(
-    x0 = hl[1, ], x1 = hl[2, ], y0 = hl[3, ], y1 = hl[4, ],
+    x0 = hl[1, ],
+    x1 = hl[2, ],
+    y0 = hl[3, ],
+    y1 = hl[4, ],
     gp = grid::gpar(
       lwd = gap_box[["size"]],
       col = gap_box[["color"]],
@@ -493,54 +541,74 @@ draw_panel_fun <- function(
 
   ## blank box
   rc <- grid::rectGrob(
-    x = rc[1, ], y = rc[2, ], width = rc[3, ], height = rc[4, ],
-    gp = grid::gpar(fill = gap_box[["fill"]], col = NA), just = "center"
+    x = rc[1, ],
+    y = rc[2, ],
+    width = rc[3, ],
+    height = rc[4, ],
+    gp = grid::gpar(fill = gap_box[["fill"]], col = NA),
+    just = "center"
   )
 
   if (axis_line[["grid_axis"]]) {
     # FIXME: corrigir os tamanhos
     # x: bottom - y: left
     v1 <- grid::segmentsGrob(
-      x0 = v_1[1, ], x1 = v_1[2, ], y0 = v_1[3, ], y1 = v_1[4, ],
+      x0 = v_1[1, ],
+      x1 = v_1[2, ],
+      y0 = v_1[3, ],
+      y1 = v_1[4, ],
       gp = grid::gpar(
         lwd = size_axis["l"],
         lex = 2,
         col = col_axis["l"],
         lty = lty_axis["l"],
-        lineend = "square", linejoin = "mitre"
+        lineend = "square",
+        linejoin = "mitre"
       )
     )
     ## x: left - y: bottom
     v2 <- grid::segmentsGrob(
-      x0 = v_2[1, ], x1 = v_2[2, ], y0 = v_2[3, ], y1 = v_2[4, ],
+      x0 = v_2[1, ],
+      x1 = v_2[2, ],
+      y0 = v_2[3, ],
+      y1 = v_2[4, ],
       gp = grid::gpar(
         lwd = size_axis["b"],
         lex = 2,
         col = col_axis["b"],
         lty = lty_axis["b"],
-        lineend = "square", linejoin = "mitre"
+        lineend = "square",
+        linejoin = "mitre"
       )
     )
     ## cut_axis down
     v3 <- grid::segmentsGrob(
-      x0 = v_3[1, ], x1 = v_3[2, ], y0 = v_3[3, ], y1 = v_3[4, ],
+      x0 = v_3[1, ],
+      x1 = v_3[2, ],
+      y0 = v_3[3, ],
+      y1 = v_3[4, ],
       gp = grid::gpar(
         lwd = size_axis["r"],
         lex = 2,
         col = col_axis["r"],
         lty = lty_axis["r"],
-        lineend = "square", linejoin = "mitre"
+        lineend = "square",
+        linejoin = "mitre"
       )
     )
     ## x: top - y: right
     v4 <- grid::segmentsGrob(
-      x0 = v_4[1, ], x1 = v_4[2, ], y0 = v_4[3, ], y1 = v_4[4, ],
+      x0 = v_4[1, ],
+      x1 = v_4[2, ],
+      y0 = v_4[3, ],
+      y1 = v_4[4, ],
       gp = grid::gpar(
         lwd = size_axis["t"],
         lex = 2,
         col = col_axis["t"],
         lty = lty_axis["t"],
-        lineend = "square", linejoin = "mitre"
+        lineend = "square",
+        linejoin = "mitre"
       )
     )
   } else {
@@ -552,7 +620,8 @@ draw_panel_fun <- function(
 
 # ===========================================
 ScaleAxisTransf <- ggplot2::ggproto(
-  "ScaleAxisTransf", GeomBlank,
+  "ScaleAxisTransf",
+  GeomBlank,
   draw_key = draw_key_blank,
   draw_panel = draw_panel_fun
 ) # end ggprotp

@@ -45,7 +45,7 @@
 }
 \arguments{
   \item{cut_axis}{
-    Which axis to break, x or y.
+    Which axis to break, y or x.
   }
   \item{cuts}{
     where to place the break in user units
@@ -97,8 +97,7 @@
   }
 
   \item{labels}{
-    One of:
-    \itemize{
+    One of: \itemize{
       \item \code{NULL} for no labels
       \item \code{waiver()} for the default labels computed by the transformation object
       \item A character vector giving labels (must be same length as \code{breaks})
@@ -187,6 +186,15 @@
   Transformations only work with continuous values: see
   \code{\link[scales:trans_new]{scales::trans_new()}} for list of transformations, and instructions
   on how to create your own.
+}
+\references{
+  John, J. A., and Draper, N. R. (1980). \emph{\bold{An Alternative Family of Transformations}}.
+  Journal of the Royal Statistical Society. Series C (Applied Statistics), \bold{29(2)},
+  190–197. \doi{https://doi.org/10.2307/2986305}
+
+  Xu, S., Chen, M., Feng, T., Zhan, L., Zhou, L., and Yu, G. (2021). \emph{\bold{Use ggbreak to
+  Effectively Utilize Plotting Space to Deal With Large Datasets and Outliers}}.
+  Frontiers in Genetics, \bold{12:774846}. \doi{https://doi.org/10.3389/fgene.2021.774846}
 }
 \examples{
   \dontrun{

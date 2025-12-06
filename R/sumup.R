@@ -163,7 +163,8 @@ miss <- function(
         )
       } else {
         list(
-          sum(is.na(x)) + sum(x <= max(missing.val, na.rm = TRUE), na.rm = TRUE),
+          sum(is.na(x)) +
+            sum(x <= max(missing.val, na.rm = TRUE), na.rm = TRUE),
           x <= max(missing.val, na.rm = TRUE)
         )
       }
@@ -176,7 +177,8 @@ miss <- function(
         )
       } else {
         list(
-          sum(is.na(x)) + sum(x >= max(missing.val, na.rm = TRUE), na.rm = TRUE),
+          sum(is.na(x)) +
+            sum(x >= max(missing.val, na.rm = TRUE), na.rm = TRUE),
           x >= max(missing.val, na.rm = TRUE)
         )
       }
@@ -627,52 +629,62 @@ sumup <- function(
   # summary
   DT[,
     c(edn) := list(
-      total_n, # Total_N
+      .N, # N
       miss_count, # Missing
       NA, # Valid_N
-      do.call( # Min
+      do.call(
+        # Min
         "min",
         c(list(x = eval(measure.var)), match_dots(dots, min))
       ),
-      do.call( # Max
+      do.call(
+        # Max
         "max",
         c(list(x = eval(measure.var)), match_dots(dots, max))
       ),
-      do.call( # Median
+      do.call(
+        # Median
         "median",
         c(list(x = eval(measure.var)), match_dots(dots, median))
       ),
-      do.call( # SAM (Simple Arithmetic Mean)
+      do.call(
+        # SAM (Simple Arithmetic Mean)
         "mean.default",
         c(
           list(x = eval(measure.var), trim = 0),
           match_dots(dots, mean.default, arg.rm = "trim")
         )
       ),
-      do.call( # TM10 Trimmed Mean 10%
+      do.call(
+        # TM10 Trimmed Mean 10%
         "mean.default",
         c(
           list(x = eval(measure.var), trim = 0.1),
           match_dots(dots, mean.default, arg.rm = "trim")
         )
       ),
-      do.call( # MAD
+      do.call(
+        # MAD
         "mad",
         c(list(x = eval(measure.var)), match_dots(dots, mad))
       ),
-      do.call( # SD
+      do.call(
+        # SD
         "sd",
         c(list(eval(measure.var)), match_dots(dots, sd))
       ),
-      do.call( # SE
+      do.call(
+        # SE
         "standard_error",
         c(list(x = eval(measure.var)), match_dots(dots, standard_error))
       ),
-      do.call( # CV
+      do.call(
+        # CV
         "coef_var",
         c(list(x = eval(measure.var)), match_dots(dots, coef_var))
       ),
-      tryCatch( # Q25
+      tryCatch(
+        # Q25
         {
           do.call(
             "quantile2",
@@ -686,7 +698,8 @@ sumup <- function(
           NA_real_
         }
       ),
-      tryCatch( # Q75
+      tryCatch(
+        # Q75
         {
           do.call(
             "quantile2",
@@ -700,7 +713,8 @@ sumup <- function(
           NA_real_
         }
       ),
-      tryCatch( # IQR
+      tryCatch(
+        # IQR
         {
           do.call(
             "iqr",
@@ -714,19 +728,23 @@ sumup <- function(
           NA_real_
         }
       ),
-      do.call( # Range
+      do.call(
+        # Range
         "amplitude",
         c(list(x = eval(measure.var)), match_dots(dots, amplitude))
       ),
-      do.call( # Skewness
+      do.call(
+        # Skewness
         "skewness",
         c(list(x = eval(measure.var)), match_dots(dots, skewness))
       ),
-      do.call( # Kurtosis
+      do.call(
+        # Kurtosis
         "kurtosis",
         c(list(x = eval(measure.var)), match_dots(dots, kurtosis))
       ),
-      do.call( # Normality
+      do.call(
+        # Normality
         "normality_test",
         c(
           list(x = eval(measure.var)),
