@@ -1,6 +1,7 @@
 #------------------------------------------------------------------------
 # Author  : izi (izi31416@protonmail.com)
 # Created : domingo jan 16, 2022 00:51:10 -03
+# usado em glocator
 #------------------------------------------------------------------------
 
 is_fw <- function(p) !is.null(p$facet$params$facets)
@@ -20,7 +21,9 @@ data_label <- function(p, strip_name, n_row, n_col) {
   for (i in 1:nc) {
     for (j in 1:nr) {
       st <- strip[[j]]$grobs[[i]]$children[2][[1]]$children[[1]]$label
-      if (is.null(st)) st <- NA
+      if (is.null(st)) {
+        st <- NA
+      }
       st <- gsub(".*: ", "", st)
       lab[[i]][j] <- st
     } # end for j
@@ -37,7 +40,6 @@ data_label <- function(p, strip_name, n_row, n_col) {
   } else {
     names(c(p$facet$params$rows))
   }
-
 
   if (is.null(pos)) {
     name_w <- names(c(p$facet$params$facets))
@@ -63,8 +65,12 @@ data_label <- function(p, strip_name, n_row, n_col) {
     DT
 
     if (!is.null(name_c)) {
-      if (n_row == 0) n_row <- 1
-      if (n_col == 0) n_col <- 1
+      if (n_row == 0) {
+        n_row <- 1
+      }
+      if (n_col == 0) {
+        n_col <- 1
+      }
       idx <- if (tb) {
         rep(seq_len(nrow(DT)), n_row)
       } else {
@@ -134,10 +140,18 @@ strip_labels <- function(p) {
     names(s) <- stn
     n_strip <- c(s, n_strip)
   }
-  if (is.na(n_strip["strip-r"])) n_strip["strip-r"] <- 1
-  if (is.na(n_strip["strip-t"])) n_strip["strip-t"] <- 1
-  if (is.na(n_strip["strip-l"])) n_strip["strip-l"] <- 1
-  if (is.na(n_strip["strip-b"])) n_strip["strip-b"] <- 1
+  if (is.na(n_strip["strip-r"])) {
+    n_strip["strip-r"] <- 1
+  }
+  if (is.na(n_strip["strip-t"])) {
+    n_strip["strip-t"] <- 1
+  }
+  if (is.na(n_strip["strip-l"])) {
+    n_strip["strip-l"] <- 1
+  }
+  if (is.na(n_strip["strip-b"])) {
+    n_strip["strip-b"] <- 1
+  }
 
   r_row <- sum(grepl(pattern = "strip-r", gp$layout$name))
   l_row <- sum(grepl(pattern = "strip-l", gp$layout$name))
@@ -148,9 +162,11 @@ strip_labels <- function(p) {
   n_col <- max(t_col, b_col)
 
   if (!is_fw(p) && n_row != 0 && n_col != 0) {
-    DD <- sapply(strip_name,
+    DD <- sapply(
+      strip_name,
       data_label,
-      p = p, n_row = n_row,
+      p = p,
+      n_row = n_row,
       n_col = n_col,
       simplify = F
     )
