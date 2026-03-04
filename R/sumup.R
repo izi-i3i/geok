@@ -3,7 +3,7 @@
 # Created : 8 de set de 2018 23:56:26 -03
 #-------------------------------------------
 
-# standard_error ============================
+# ─────────────────────────────────────────────────── standard_error ──
 standard_error <- function(x, na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -12,7 +12,7 @@ standard_error <- function(x, na.rm = FALSE) {
   sd(x) / sqrt(n)
 } # end standard_error
 
-# idots =====================================
+# ──────────────────────────────────────────────────────────── idots ──
 indots <- function(arg, default, ...) {
   dots <- list(...)
   out <- unlist(dots[arg])
@@ -22,7 +22,7 @@ indots <- function(arg, default, ...) {
   out
 }
 
-# match_dots ================================
+# ─────────────────────────────────────────────────────── match_dots ──
 match_dots <- function(args, fn, arg.rm = "") {
   fa <- formalArgs(args(fn))
   #' rmv <- match(arg.rm, names(args))
@@ -31,7 +31,7 @@ match_dots <- function(args, fn, arg.rm = "") {
   args[ag[!is.na(ag)]]
 }
 
-# winsorize =================================
+# ──────────────────────────────────────────────────────── winsorize ──
 winsorize <- function(
   x,
   minval = NULL,
@@ -54,7 +54,7 @@ winsorize <- function(
   return(x)
 }
 
-# winvar ====================================
+# ─────────────────────────────────────────────────────────── winvar ──
 winvar <- function(x, trim.ci) {
   if (any(is.na(x))) {
     return(NA_real_)
@@ -68,7 +68,7 @@ winvar <- function(x, trim.ci) {
   return(c(var = winvar, df = df))
 }
 
-# freq_tab ==================================
+# ───────────────────────────────────────────────────────── freq_tab ──
 freq_tab <- function(x, na.rm = FALSE, ...) {
   . <- f <- p <- NULL
   h <- substitute(x)
@@ -188,7 +188,7 @@ miss <- function(
   return(out)
 } # end missing
 
-# interval_range ============================
+# ─────────────────────────────────────────────────── interval_range ──
 interval_range <- function(x, digits = 2, decimal.mark = ",", na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -222,7 +222,7 @@ interval_range <- function(x, digits = 2, decimal.mark = ",", na.rm = FALSE) {
   return(res)
 } # end interval_range
 
-# coef_params ===============================
+# ────────────────────────────────────────────────────── coef_params ──
 coef_params <- function(x, default = NULL) {
   sx <- as.character(substitute(x))
 
@@ -297,7 +297,7 @@ coef_params <- function(x, default = NULL) {
   return(list("changed" = valid_names, "vector" = vec))
 }
 
-# quantile2 =================================
+# ──────────────────────────────────────────────────────── quantile2 ──
 quantile2 <- function(x, probs = c(0.5), quantile.type = 7, na.rm = FALSE) {
   quantile(x, probs = probs, type = quantile.type, na.rm = na.rm, names = FALSE)
 }
@@ -306,7 +306,7 @@ iqr <- function(x, na.rm = FALSE, quantile.type = 7) {
   IQR(x, na.rm = na.rm, type = quantile.type)
 }
 
-# symbs =====================================
+# ──────────────────────────────────────────────────────────── symbs ──
 symbs <- function(
   symb.mean = NULL,
   symb.median = NULL,
@@ -375,7 +375,7 @@ symbs <- function(
   )
 }
 
-# ad_test ===================================
+# ────────────────────────────────────────────────────────── ad_test ──
 ad_test <- function(x) {
   dname <- deparse(substitute(x))
   x <- sort(x[complete.cases(x)])
@@ -413,7 +413,7 @@ ad_test <- function(x) {
   return(rval)
 }
 
-# normality_test ============================
+# ─────────────────────────────────────────────────── normality_test ──
 normality_test <- function(
   x,
   method.normality = c(
@@ -482,7 +482,7 @@ normality_test <- function(
   return(out)
 }
 
-# sumup =================================
+# ──────────────────────────────────────────────────────────── sumup ──
 sumup <- function(
   x,
   measure.var,
