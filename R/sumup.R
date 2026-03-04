@@ -93,7 +93,7 @@ freq_tab <- function(x, na.rm = FALSE, ...) {
   return(FQ[])
 } # end freq_tab
 
-# kurtosis ==================================
+# ───────────────────────────────────────────────────────── kurtosis ──
 kurtosis <- function(x, kurtosis.type = 2, na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -109,7 +109,7 @@ kurtosis <- function(x, kurtosis.type = 2, na.rm = FALSE) {
   return(out)
 } # end kurtosis
 
-# skewness ==================================
+# ───────────────────────────────────────────────────────── skewness ──
 skewness <- function(x, skewness.type = 2, na.rm = FALSE) {
   if (isTRUE(na.rm)) {
     x <- x[!is.na(x)]
@@ -125,17 +125,17 @@ skewness <- function(x, skewness.type = 2, na.rm = FALSE) {
   return(out)
 } # end skewness
 
-# trimmed_mean ==============================
+# ───────────────────────────────────────────────────── trimmed_mean ──
 trimmed_mean <- function(x, trim = .1, na.rm = FALSE) {
   sapply(trim, FUN = mean, x = x, na.rm = na.rm, USE.NAMES = FALSE)
 }
 
-# amplitude =================================
+# ──────────────────────────────────────────────────────── amplitude ──
 amplitude <- function(x, na.rm = FALSE) {
   return(max(x, na.rm = na.rm) - min(x, na.rm = na.rm))
 }
 
-# coef_var ==================================
+# ───────────────────────────────────────────────────────── coef_var ──
 coef_var <- function(x, na.rm = FALSE) {
   return(sd(x, na.rm = na.rm) / mean(x, na.rm = na.rm))
 }
