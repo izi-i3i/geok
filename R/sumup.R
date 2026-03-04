@@ -140,7 +140,7 @@ coef_var <- function(x, na.rm = FALSE) {
   return(sd(x, na.rm = na.rm) / mean(x, na.rm = na.rm))
 }
 
-# miss ======================================
+# ───────────────────────────────────────────────────────────── miss ──
 miss <- function(
   x,
   missing.val = NA,
@@ -546,10 +546,9 @@ sumup <- function(
     DT <- copy(x)
   } # endif
 
-  # total n
+  # # total n
   total_n <- DT[, .N]
-
-  # missing count
+  # # missing count
   miss_count <- DT[
     ,
     do.call(
@@ -629,8 +628,16 @@ sumup <- function(
   # summary
   DT[,
     c(edn) := list(
-      .N, # N
-      miss_count, # Missing
+      # .N,
+      # do.call(
+      #   "miss",
+      #   c(
+      #     list(x = eval(measure.var), missing.val = missing.val),
+      #     match_dots(dots, miss)
+      #   )
+      # )$count,
+      total_n,
+      miss_count,
       NA, # Valid_N
       do.call(
         # Min
