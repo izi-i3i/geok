@@ -147,6 +147,9 @@ miss <- function(
   action = c("<=", "=", ">=")
 ) {
   action <- match.arg(action)
+  na_mv <- any(is.na(missing.val))
+  length_mv <- length(missing.val)
+  sum_na <- ifelse(na_mv, sum(is.na(x)), 0)
 
   out <- switch(action,
     "=" = {
@@ -156,30 +159,32 @@ miss <- function(
       )
     },
     "<=" = {
-      if (length(missing.val) == 1 & any(is.na(missing.val))) {
+      if (length_mv == 1 & na_mv) {
         list(
-          sum(is.na(x)),
+          sum_na,
           is.na(x)
         )
       } else {
+        m <- x <= max(missing.val, na.rm = TRUE)
+        m[is.na(m)] <- FALSE
         list(
-          sum(is.na(x)) +
-            sum(x <= max(missing.val, na.rm = TRUE), na.rm = TRUE),
-          x <= max(missing.val, na.rm = TRUE)
+          sum_na + sum(m, na.rm = TRUE),
+          m
         )
       }
     },
     ">=" = {
-      if (length(missing.val) == 1 & any(is.na(missing.val))) {
+      if (length_mv == 1 & na_mv) {
         list(
-          sum(is.na(x)),
+          sum_na,
           is.na(x)
         )
       } else {
+        m <- x >= max(missing.val, na.rm = TRUE)
+        m[is.na(m)] <- FALSE
         list(
-          sum(is.na(x)) +
-            sum(x >= max(missing.val, na.rm = TRUE), na.rm = TRUE),
-          x >= max(missing.val, na.rm = TRUE)
+          sum_na + sum(m, na.rm = TRUE),
+          m
         )
       }
     }
@@ -506,7 +511,7 @@ sumup <- function(
   symb.body = symbs(),
   ...
 ) {
-  . <- Missing <- Total_N <- Valid_N <- id <- NULL
+  . <- N <- mc <- Missing <- Total_N <- Valid_N <- id <- NULL
 
   dots <- list(...)
   n_probs <- length(dots$probs)
@@ -521,7 +526,9 @@ sumup <- function(
     if (decimal.mark == "auto") decimal.mark <- "."
   }
 
-  if (is.vector(x) || is.name(x)) {
+  vector_x <- is.vector(x)
+
+  if (vector_x || is.name(x)) {
     if (is.name(x)) {
       mvar <- as.character(x)
     } else {
@@ -546,19 +553,29 @@ sumup <- function(
     DT <- copy(x)
   } # endif
 
-  # # total n
-  total_n <- DT[, .N]
+  # total n
+  total_n <- DT[, .(.N), by = group.by][, N]
+
   # # missing count
-  miss_count <- DT[
-    ,
-    do.call(
-      "miss",
-      c(
-        list(x = eval(measure.var), missing.val = missing.val),
-        match_dots(dots, miss)
-      )
-    )[[1]]
-  ]
+  miss_count <- DT[,
+    .(
+      mc = do.call(
+        "miss",
+        c(
+          list(x = eval(measure.var), missing.val = missing.val),
+          match_dots(dots, miss)
+        )
+      )$count
+    ),
+    by = group.by
+  ][, mc]
+
+  # valid n
+  valid_n <- if (missing.rm) {
+    total_n - miss_count
+  } else {
+    total_n
+  }
 
   # remove missing
   if (missing.rm) {
@@ -569,7 +586,7 @@ sumup <- function(
           list(x = eval(measure.var), missing.val = missing.val),
           match_dots(dots, miss)
         )
-      )[[2]]
+      )$missing
     ]
   }
 
@@ -636,9 +653,9 @@ sumup <- function(
       #     match_dots(dots, miss)
       #   )
       # )$count,
-      total_n,
-      miss_count,
-      NA, # Valid_N
+      NA_integer_, # Total_N
+      NA_integer_, # Missing
+      NA_integer_, # Valid_N
       do.call(
         # Min
         "min",
@@ -761,9 +778,6 @@ sumup <- function(
     ),
     by = group.by
   ]
-
-  # Valid_N
-  DT[, Valid_N := Total_N - Missing]
 
   qdots <- match_dots(dots, quantile2)
   qprob <- qdots[names(qdots) == "probs"]
@@ -896,13 +910,18 @@ sumup <- function(
       by = group.by
     ]
   }
-
+  NUM[, (edn[1]) := total_n]
+  NUM[, (edn[2]) := miss_count]
+  NUM[, (edn[3]) := valid_n]
   NF <- NUM[, .SD, .SDcols = param_ft]
   NUM <- NUM[, .SD, .SDcols = !c(param_ft), by = group.by]
   setnames(NF, parametros)
   NF[, id := seq_len(.N)]
 
   SMT <- HEAD[NF, on = "id"]
+  SMT[, Total_N := total_n]
+  SMT[, Missing := miss_count]
+  SMT[, Valid_N := valid_n]
   SMT <- SMT[, lapply(.SD, as.character)]
   NUM[, id := NULL]
 
