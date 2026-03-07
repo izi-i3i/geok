@@ -960,7 +960,7 @@ sumup <- function(
     params_names <- c(
       Total_N = "N_Total",
       Missing = "Valor_Faltante",
-      Valid_N = "N_Válidos",
+      Valid_N = "N_V\u00E1lidos",
       Min = "M\u00Ednimo",
       Max = "M\u00E1ximo",
       Median = "Mediana",

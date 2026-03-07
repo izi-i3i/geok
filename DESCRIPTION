@@ -1,6 +1,6 @@
 Package: geok
 Title: Suport krigagem in qgis
-Version: 0.0.927
+Version: 0.0.928
 Imports: data.table, stats, methods, ggplot2, scales, cowplot
 Suggests: knitr, rmarkdown
 LinkingTo: RcppEigen (>= 0.3.2.9.0), Rcpp (>= 0.12.6), RcppArmadillo (>= 0.7.600.1.0)
