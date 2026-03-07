@@ -1,6 +1,7 @@
 #-------------------------------------------
 # Author  : Izi (izi31416@protonmail.com)
 # Created : 8 de set de 2018 23:56:26 -03
+# Updated: sáb 07 mar 2026 13:50:58
 #-------------------------------------------
 
 # ─────────────────────────────────────────────────── standard_error ──
@@ -536,6 +537,7 @@ sumup <- function(
       mvar <- as.character(substitute(x))
     }
 
+    n_na <- sum(is.na(x))
     measure.var <- str2lang(mvar)
     DT <- data.table()[, (mvar) := eval(x)]
 
@@ -547,7 +549,7 @@ sumup <- function(
     if (!is.character(measure.var)) {
       stop("In measure.var: only characters", call. = FALSE)
     }
-
+    n_na <- 0
     mvar <- measure.var
     measure.var <- str2lang(measure.var)
     setDT(x)
@@ -557,7 +559,7 @@ sumup <- function(
   # total n
   total_n <- DT[, .(.N), by = group.by][, N]
 
-  # # missing count
+  # missing count
   miss_count <- DT[,
     .(
       mc = do.call(
@@ -572,10 +574,16 @@ sumup <- function(
   ][, mc]
 
   # valid n
+  if (is.null(dots$na.rm)) {
+    dots$na.rm <- FALSE
+  }
   valid_n <- if (missing.rm) {
     total_n - miss_count
   } else {
-    total_n
+    if (!dots$na.rm) {
+      n_na <- 0
+    }
+    total_n - n_na
   }
 
   # remove missing
@@ -646,14 +654,6 @@ sumup <- function(
   # summary
   DT[,
     c(edn) := list(
-      # .N,
-      # do.call(
-      #   "miss",
-      #   c(
-      #     list(x = eval(measure.var), missing.val = missing.val),
-      #     match_dots(dots, miss)
-      #   )
-      # )$count,
       NA_integer_, # Total_N
       NA_integer_, # Missing
       NA_integer_, # Valid_N
@@ -785,9 +785,10 @@ sumup <- function(
 
   # dots - probs - quantile
   if (!is.null(dots$probs)) {
-    for (i in seq_along(n_probs)) {
+    for (i in seq_len(n_probs)) {
+      p <- paste0("Q", dots$probs[i] * 100)
       DT[,
-        (paste0("Q", dots$probs[i] * 100)) := .(
+        (p) := .(
           tryCatch(
             {
               do.call(
@@ -959,7 +960,7 @@ sumup <- function(
     params_names <- c(
       Total_N = "N_Total",
       Missing = "Valor_Faltante",
-      Valid_N = "N_Amostral",
+      Valid_N = "N_Válidos",
       Min = "M\u00Ednimo",
       Max = "M\u00E1ximo",
       Median = "Mediana",
