@@ -307,6 +307,7 @@ quantile2 <- function(x, probs = c(0.5), quantile.type = 7, na.rm = FALSE) {
   quantile(x, probs = probs, type = quantile.type, na.rm = na.rm, names = FALSE)
 }
 
+# ────────────────────────────────────────────────────────────── iqr ──
 iqr <- function(x, na.rm = FALSE, quantile.type = 7) {
   IQR(x, na.rm = na.rm, type = quantile.type)
 }
