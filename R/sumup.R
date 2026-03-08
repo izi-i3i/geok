@@ -959,8 +959,8 @@ sumup <- function(
   if (language == "pt") {
     params_names <- c(
       Total_N = "N_Total",
-      Missing = "Valor_Faltante",
-      Valid_N = "N_V\u00E1lidos",
+      Missing = "N_Faltante",
+      Valid_N = "N_V\u00E1lido",
       Min = "M\u00Ednimo",
       Max = "M\u00E1ximo",
       Median = "Mediana",
