@@ -558,6 +558,7 @@ sumup <- function(
 
   # total n
   total_n <- DT[, .(.N), by = group.by][, N]
+  total_n <- as.integer(total_n)
 
   # missing count
   miss_count <- DT[,
@@ -572,6 +573,7 @@ sumup <- function(
     ),
     by = group.by
   ][, mc]
+  miss_count <- as.integer(miss_count)
 
   # valid n
   if (is.null(dots$na.rm)) {
@@ -585,6 +587,7 @@ sumup <- function(
     }
     total_n - n_na
   }
+  valid_n <- as.integer(valid_n)
 
   # remove missing
   if (missing.rm) {
