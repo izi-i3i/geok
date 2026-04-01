@@ -424,9 +424,9 @@ ad_test <- function(x) {
 normality_test <- function(
   x,
   method.normality = c(
+    "anderson.darling",
     "shapiro.wilk",
-    "kolmogorov.smirnov",
-    "anderson.darling"
+    "kolmogorov.smirnov"
   ),
   na.rm = FALSE,
   ...
