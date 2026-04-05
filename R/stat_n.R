@@ -26,7 +26,7 @@ stat_n <- function(
   ypos = 0,
   position = "identity",
   inherit.aes = TRUE,
-  show.legend = NA,
+  show.legend = FALSE,
   na.rm = FALSE,
   vjust = 1.5,
   prefix = NULL,
