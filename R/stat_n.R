@@ -3,13 +3,19 @@
 ## Created : seg 20 jul 2020 09:55:55 -03
 ## -------------------------------------------
 
-StatN <- ggproto("StatN", Stat,
+StatN <- ggproto(
+  "StatN",
+  Stat,
   required_aes = c("x", "y"),
   compute_group = function(data, scales, ypos, prefix) {
     y <- data$y
     y <- y[!is.na(y)]
     n <- length(y)
-    data.frame(x = data$x[1], y = ypos, label = paste0(prefix, n))
+    if (is.null(ypos)) {
+      data.frame(x = data$x[1], y = min(y), label = paste0(prefix, n))
+    } else {
+      data.frame(x = data$x[1], y = ypos, label = paste0(prefix, n))
+    }
   }
 )
 
@@ -23,7 +29,6 @@ stat_n <- function(
   show.legend = NA,
   na.rm = FALSE,
   vjust = 1.5,
-  color = "gray30",
   prefix = NULL,
   ...
 ) {
@@ -40,7 +45,6 @@ stat_n <- function(
       ypos = ypos,
       na.rm = na.rm,
       vjust = vjust,
-      color = color,
       ...
     )
   )

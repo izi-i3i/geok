@@ -17,7 +17,6 @@
     show.legend = NA,
     na.rm = FALSE,
     vjust = 1.5,
-    color = "gray30",
     prefix = NULL,
     ...
   )
@@ -32,7 +31,6 @@
 \item{show.legend}{show}
 \item{na.rm}{na}
 \item{vjust}{vjust}
-\item{color}{color}
 \item{prefix}{prefix}
 \item{\ldots}{args}
 }
