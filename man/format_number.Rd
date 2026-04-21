@@ -10,7 +10,7 @@ format_number(
   x,
   nsmall = NULL,
   value = FALSE,
-  decimal_mark = ",",
+  decimal.mark = ",",
   preffix = NULL,
   suffix = NULL,
   p = FALSE,
@@ -25,7 +25,7 @@ format_number(
           in formatting real/complex numbers in non-scientific formats.
           Allowed values are '0 <= nsmall <= 20'.}
 \item{value}{value}
-\item{decimal_mark}{decimal.mark}
+\item{decimal.mark}{decimal.mark}
 \item{preffix}{preffix}
 \item{suffix}{suffix}
 \item{p}{p}
