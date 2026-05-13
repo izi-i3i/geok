@@ -415,7 +415,7 @@ ad_test <- function(x) {
     method = "Anderson-Darling normality test",
     data.name = dname
   )
-  class(rval) <- "htest"
+  # class(rval) <- "htest"
 
   return(rval)
 }
@@ -424,6 +424,7 @@ ad_test <- function(x) {
 normality_test <- function(
   x,
   method.normality = c(
+    "auto",
     "anderson.darling",
     "shapiro.wilk",
     "kolmogorov.smirnov"
@@ -436,6 +437,21 @@ normality_test <- function(
   }
 
   method.normality <- match.arg(method.normality)
+
+  if (method.normality == "auto") {
+    nx <- length(x)
+    method.normality <- if (nx > 7) {
+      "anderson.darling"
+    } else if (nx >= 3 && nx <= 5000) {
+      "shapiro.wilk"
+    } else {
+      # warning(
+      #   "normality_test: sample size must be greater than 2",
+      #   call. = FALSE
+      # )
+      return(NA)
+    }
+  }
 
   out <- switch(method.normality,
     shapiro.wilk = {
